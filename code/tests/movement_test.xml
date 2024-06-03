@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+const int GRID_SIZE = 3;
+
+
+int riga[GRID_SIZE] = {0,1,1};
+int p_position[GRID_SIZE] = {0, 1, 2};
+
+int sum_array(){
+  int somma = 0;
+  for (i : int[0,GRID_SIZE-1]) {
+    somma = somma + riga[i];
+  }
+  return somma;
+}</declaration>
+	<template>
+		<name x="5" y="5">Template</name>
+		<parameter>int person_id</parameter>
+		<declaration>// Place local declarations here.
+
+bool can_move_up(){
+    int current_position = p_position[person_id];
+    if (current_position == GRID_SIZE - 1) return false;
+    else return riga[current_position + 1] == 0;
+}
+
+bool can_move_down(){
+    int current_position = p_position[person_id];
+    if (current_position == 0) return false;
+    else return riga[current_position - 1] == 0;
+}
+
+void move_up(){
+    int current_position = p_position[person_id];
+    riga[current_position] = 0; // libero la vecchia posizione
+    p_position[person_id] = p_position[person_id] + 1;
+    riga[current_position + 1] = 1;
+}
+
+void move_down(){
+    int current_position = p_position[person_id];
+    riga[current_position] = 0;
+    p_position[person_id] = p_position[person_id] - 1;
+    riga[current_position -1] = 1;
+}</declaration>
+		<location id="id0" x="-1343" y="-34">
+		</location>
+		<location id="id1" x="-1037" y="-34">
+		</location>
+		<init ref="id0"/>
+		<transition id="id2">
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<nail x="-1079" y="144"/>
+			<nail x="-1283" y="144"/>
+		</transition>
+		<transition id="id3">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-1249" y="-68">can_move_down()</label>
+			<label kind="assignment" x="-1241" y="-25">move_down()</label>
+		</transition>
+		<transition id="id4">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-1258" y="-187">can_move_up()</label>
+			<label kind="assignment" x="-1258" y="-212">move_up()</label>
+			<nail x="-1258" y="-153"/>
+			<nail x="-1139" y="-153"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+P1 = Template(1);
+P2 = Template(2);
+
+// List one or more processes to be composed into a system.
+system P1, P2;
+</system>
+	<queries>
+		<query>
+			<formula>A[] sum_array() == 2</formula>
+			<comment>Verifica che i processi non possano finire sullo stesso posto.</comment>
+			<result outcome="success" type="quality" timestamp="2024-06-03 21:21:36 +0200">
+			</result>
+		</query>
+	</queries>
+</nta>
