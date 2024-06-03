@@ -113,7 +113,7 @@ void move_down(){
 		<transition id="id4">
 			<source ref="id0"/>
 			<target ref="id1"/>
-			<label kind="guard" x="-1265" y="-467">can_move_right()</label>
+			<label kind="guard" x="-1283" y="-467">can_move_right()</label>
 			<label kind="assignment" x="-1265" y="-433">move_right()</label>
 			<nail x="-1283" y="-433"/>
 			<nail x="-1122" y="-433"/>
@@ -121,7 +121,7 @@ void move_down(){
 		<transition id="id5">
 			<source ref="id0"/>
 			<target ref="id1"/>
-			<label kind="guard" x="-1265" y="-323">can_move_left()</label>
+			<label kind="guard" x="-1275" y="-314">can_move_left()</label>
 			<label kind="assignment" x="-1265" y="-289">move_left()</label>
 			<nail x="-1283" y="-289"/>
 			<nail x="-1130" y="-289"/>
