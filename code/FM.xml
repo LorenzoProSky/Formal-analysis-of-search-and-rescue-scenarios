@@ -8,7 +8,6 @@ const int N_COL = 20;
 const int N_DRONE = 5;
 const int N_FIRST-RESPONDER = 5;
 const int N_CIVILIAN = 10;
-// a
 
 const int droneNv[N_DRONE] = [];
 const int firstResponderTfr[N_FIRST-RESPONDER] = [];
