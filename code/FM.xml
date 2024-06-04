@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>// Global declaration
+// System features
+const int N_ROW = 20;
+const int N_COL = 20;
+const int N_DRONE = 5;
+const int N_FIRST-RESPONDER = 5;
+const int N_CIVILIAN = 10;
+
+const int droneNv[N_DRONE] = [];
+const int firstResponderTfr[N_FIRST-RESPONDER] = [];
+const int civilianTv[N_CIVILIAN] = [];
+const int civilianTzr[N_CIVILIAN] = [];
+
+// Variable Declaration
+int map[N_ROW][N_COL];
+int droneId[N_DRONE];
+int firstResponderId[N_FIRST-RESPONDER];
+int civilianId[N_CIVILIAN];
+
+// Channel declaration
+chan broadcast ready;
+chan communication;
+chan assistance;
+chan contact;
+chan broadcast youAreSafe;
+chan priority assistance &lt; default;
+
+// Function declaration</declaration>
+	<template>
+		<name>Initializer</name>
+		<declaration>void setUp() {
+
+}</declaration>
+		<location id="id0" x="-561" y="-68">
+		</location>
+		<location id="id1" x="-425" y="-68">
+		</location>
+		<init ref="id0"/>
+		<transition id="id2">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-518" y="-93">ready!</label>
+			<label kind="assignment" x="-527" y="-59">setUp()</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Drone</name>
+		<parameter>const int Id, const int Nv</parameter>
+		<declaration>// Function declaration
+void patrol() { // Drone moving policy
+
+}
+
+bool isInRange() {
+
+}
+
+void giveInstruction() { // Drone decision-making policy
+
+}</declaration>
+		<location id="id3" x="-2167" y="-374">
+			<name x="-2210" y="-416">patrolling</name>
+		</location>
+		<location id="id4" x="-1878" y="-374">
+			<name x="-1929" y="-416">communicating</name>
+			<committed/>
+		</location>
+		<location id="id5" x="-2346" y="-374">
+		</location>
+		<init ref="id5"/>
+		<transition id="id6">
+			<source ref="id5"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-2286" y="-399">ready?</label>
+		</transition>
+		<transition id="id7">
+			<source ref="id4"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-2091" y="-561">communication!</label>
+			<label kind="assignment" x="-2099" y="-544">giveInstruction()</label>
+			<nail x="-2031" y="-518"/>
+		</transition>
+		<transition id="id8">
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-2074" y="-399">isInRange()</label>
+		</transition>
+		<transition id="id9">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="assignment" x="-2244" y="-264">patrol()</label>
+			<nail x="-2167" y="-272"/>
+			<nail x="-2261" y="-272"/>
+		</transition>
+	</template>
+	<template>
+		<name>First-Responder</name>
+		<parameter>const int Id, const int Tfr</parameter>
+		<declaration>// Clock declaration
+clock x;
+
+// Function declaration
+void wandering() { // First-Responder moving policy
+
+}
+
+bool isInRange() {
+
+}
+
+bool isDead() {
+
+}
+
+void assistanceFinished() {
+
+}</declaration>
+		<location id="id10" x="-1156" y="-442">
+			<name x="-1190" y="-476">Wandering</name>
+		</location>
+		<location id="id11" x="-569" y="-476">
+			<name x="-579" y="-510">Assisting</name>
+			<label kind="invariant" x="-579" y="-459">x &lt;= Tfr</label>
+		</location>
+		<location id="id12" x="-1215" y="-739">
+		</location>
+		<location id="id13" x="-561" y="-239">
+			<name x="-603" y="-281">Contacting</name>
+			<label kind="invariant" x="-697" y="-213">x &lt;= Tfr + getDistance(1) + getDistance(2)</label>
+		</location>
+		<location id="id14" x="-1054" y="-595">
+			<committed/>
+		</location>
+		<location id="id15" x="-1054" y="-442">
+			<committed/>
+		</location>
+		<location id="id16" x="-85" y="-238">
+			<label kind="invariant" x="-229" y="-212">x &lt;= Tfr + getDistance(1) + getDistance(2)</label>
+		</location>
+		<init ref="id12"/>
+		<transition id="id17">
+			<source ref="id14"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-1232" y="-637">contact?</label>
+			<label kind="assignment" x="-1232" y="-620">x = 0</label>
+			<nail x="-1249" y="-595"/>
+			<nail x="-1249" y="-246"/>
+		</transition>
+		<transition id="id18">
+			<source ref="id16"/>
+			<target ref="id14"/>
+			<label kind="guard" x="-332" y="-451">x &gt;= Tfr + getDistance(1) + getDistance(2)</label>
+			<label kind="synchronisation" x="-170" y="-476">youAreSafe!</label>
+			<label kind="assignment" x="-221" y="-425">assistanceFinished(1)</label>
+			<nail x="-85" y="-391"/>
+			<nail x="-756" y="-391"/>
+		</transition>
+		<transition id="id19">
+			<source ref="id13"/>
+			<target ref="id16"/>
+			<label kind="guard" x="-484" y="-289">x &lt; Tfr + getDistance(1) + getDistance(2)
+&amp;&amp; isDead(2)</label>
+		</transition>
+		<transition id="id20">
+			<source ref="id13"/>
+			<target ref="id14"/>
+			<label kind="guard" x="-910" y="-340">x &gt;= Tfr + getDistance(1) + getDistance(2)</label>
+			<label kind="synchronisation" x="-765" y="-357">youAreSafe!</label>
+			<label kind="assignment" x="-825" y="-323">assistanceFinished(1,2)</label>
+			<nail x="-807" y="-323"/>
+		</transition>
+		<transition id="id21">
+			<source ref="id11"/>
+			<target ref="id14"/>
+			<label kind="guard" x="-518" y="-782">x &lt; Tfr &amp;&amp; isSafe()</label>
+			<nail x="-459" y="-476"/>
+			<nail x="-459" y="-756"/>
+			<nail x="-1054" y="-756"/>
+		</transition>
+		<transition id="id22">
+			<source ref="id15"/>
+			<target ref="id14"/>
+		</transition>
+		<transition id="id23">
+			<source ref="id11"/>
+			<target ref="id14"/>
+			<label kind="guard" x="-663" y="-688">x &lt; Tfr &amp;&amp; isDead()</label>
+			<nail x="-569" y="-663"/>
+			<nail x="-1054" y="-663"/>
+		</transition>
+		<transition id="id24">
+			<source ref="id11"/>
+			<target ref="id14"/>
+			<label kind="guard" x="-782" y="-586">x &gt;= Tfr</label>
+			<label kind="synchronisation" x="-790" y="-569">youAreSafe!</label>
+			<label kind="assignment" x="-799" y="-552">assistanceFinished()</label>
+			<nail x="-654" y="-595"/>
+		</transition>
+		<transition id="id25">
+			<source ref="id10"/>
+			<target ref="id15"/>
+			<label kind="assignment" x="-1147" y="-416">wandering()</label>
+		</transition>
+		<transition id="id26">
+			<source ref="id14"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-1207" y="-518">!isInRange()</label>
+		</transition>
+		<transition id="id27">
+			<source ref="id14"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-858" y="-518">isInRange()</label>
+			<label kind="synchronisation" x="-850" y="-501">assitance!</label>
+			<label kind="assignment" x="-841" y="-535">x = 0</label>
+			<nail x="-739" y="-476"/>
+		</transition>
+		<transition id="id28">
+			<source ref="id12"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-1173" y="-731">ready?</label>
+		</transition>
+	</template>
+	<template>
+		<name>Civilian</name>
+		<parameter>const int Id, const int Tv, const int Tzr</parameter>
+		<declaration>// Clock declaration
+clock x;
+
+// Function declaration
+void wandering() { // Civilian moving policy
+
+}
+
+bool isSafe() {
+
+}
+
+void safe() {
+
+}
+
+bool isInDanger() {
+
+}
+
+void dead() {
+
+}
+
+bool isInAssistance() {
+
+}
+
+bool isZeroResponder() {
+
+}
+
+int getDistance() {
+
+}</declaration>
+		<location id="id29" x="-595" y="-102">
+			<name x="-629" y="-136">Wandering</name>
+		</location>
+		<location id="id30" x="-960" y="-102">
+			<name x="-970" y="-136">Safe</name>
+		</location>
+		<location id="id31" x="-229" y="-102">
+			<name x="-263" y="-136">InDanger</name>
+			<label kind="invariant" x="-255" y="-85">x &lt;= Tv</label>
+		</location>
+		<location id="id32" x="-229" y="-289">
+			<name x="-248" y="-323">Dead</name>
+		</location>
+		<location id="id33" x="68" y="-102">
+			<name x="17" y="-144">InAssistance</name>
+		</location>
+		<location id="id34" x="-595" y="-374">
+			<name x="-605" y="-408">Listening</name>
+			<committed/>
+		</location>
+		<location id="id35" x="-807" y="-476">
+			<name x="-858" y="-510">ZeroResponder</name>
+			<label kind="invariant" x="-901" y="-459">x &lt;= Tzr + getDistance()</label>
+		</location>
+		<location id="id36" x="-229" y="-535">
+			<name x="-239" y="-569">Contacting</name>
+		</location>
+		<location id="id37" x="-348" y="-195">
+		</location>
+		<init ref="id37"/>
+		<transition id="id38">
+			<source ref="id37"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="-518" y="-170">ready?</label>
+		</transition>
+		<transition id="id39">
+			<source ref="id35"/>
+			<target ref="id29"/>
+			<label kind="guard" x="-884" y="-212">isDead()</label>
+			<nail x="-807" y="-195"/>
+		</transition>
+		<transition id="id40">
+			<source ref="id36"/>
+			<target ref="id30"/>
+			<label kind="synchronisation" x="-850" y="-603">youAreSafe?</label>
+			<label kind="assignment" x="-833" y="-578">safe()</label>
+			<nail x="-1292" y="-535"/>
+			<nail x="-1292" y="-102"/>
+		</transition>
+		<transition id="id41">
+			<source ref="id34"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-450" y="-408">contact!</label>
+			<label kind="assignment" x="-442" y="-391">x = 0</label>
+		</transition>
+		<transition id="id42">
+			<source ref="id35"/>
+			<target ref="id30"/>
+			<label kind="guard" x="-1181" y="-382">x &gt;= Tzr + getDistance()</label>
+			<label kind="synchronisation" x="-1122" y="-408">youAreSafe!</label>
+			<label kind="assignment" x="-1207" y="-357">assistanceFinished(),safe()</label>
+			<nail x="-960" y="-476"/>
+		</transition>
+		<transition id="id43">
+			<source ref="id34"/>
+			<target ref="id35"/>
+			<label kind="guard" x="-781" y="-408">isZeroResponder()</label>
+			<label kind="synchronisation" x="-722" y="-391">assitance!</label>
+			<label kind="assignment" x="-679" y="-374">x = 0</label>
+		</transition>
+		<transition id="id44">
+			<source ref="id29"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="-654" y="-229">communication?</label>
+		</transition>
+		<transition id="id45">
+			<source ref="id33"/>
+			<target ref="id30"/>
+			<label kind="synchronisation" x="-510" y="102">youAreSafe?</label>
+			<label kind="assignment" x="-493" y="136">safe()</label>
+			<nail x="68" y="127"/>
+			<nail x="-960" y="127"/>
+		</transition>
+		<transition id="id46">
+			<source ref="id33"/>
+			<target ref="id32"/>
+			<label kind="guard" x="-59" y="-212">x &gt;= Tv</label>
+			<label kind="assignment" x="-34" y="-195">dead()</label>
+		</transition>
+		<transition id="id47">
+			<source ref="id31"/>
+			<target ref="id33"/>
+			<label kind="guard" x="-153" y="-136">isInAssistance()</label>
+			<label kind="synchronisation" x="-127" y="-93">assistance?</label>
+		</transition>
+		<transition id="id48">
+			<source ref="id31"/>
+			<target ref="id32"/>
+			<label kind="guard" x="-212" y="-212">x &gt;= Tv</label>
+			<label kind="assignment" x="-212" y="-195">dead()</label>
+		</transition>
+		<transition id="id49">
+			<source ref="id29"/>
+			<target ref="id31"/>
+			<label kind="guard" x="-450" y="-127">isInDanger()</label>
+			<label kind="assignment" x="-459" y="-93">danger(), x = 0</label>
+		</transition>
+		<transition id="id50">
+			<source ref="id29"/>
+			<target ref="id30"/>
+			<label kind="guard" x="-824" y="-127">isSafe()</label>
+			<label kind="assignment" x="-816" y="-93">safe()</label>
+		</transition>
+		<transition id="id51">
+			<source ref="id29"/>
+			<target ref="id29"/>
+			<label kind="assignment" x="-637" y="17">wandering()</label>
+			<nail x="-501" y="8"/>
+			<nail x="-680" y="8"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+DroneProcess = Drone(droneId, droneNv);
+FirstResponderProcess = FirstResponder(firstResponderId, firstResponderTfr);
+CivilianProcess = Civillian(civilianId, civilianTv, civilianTzr);
+
+// List one or more processes to be composed into a system.
+system DroneProcess, FirstResponderProcess, CivilianProcess;
+system 
+</system>
+	<queries>
+		<query>
+			<formula/>
+			<comment/>
+		</query>
+	</queries>
+</nta>
