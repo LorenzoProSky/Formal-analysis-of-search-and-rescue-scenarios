@@ -187,6 +187,7 @@ void initializePositions() {
 }
 
 // checks if a entity can move in the provided direction
+// positions is the array that containts the position for the various Templates i.e. Drone, FirstResponder, Civilian
 bool canMoveGeneral(int direction, int&amp; positions[MAX_ARRAY_SIZE], int person_id) {
 
     Position current_position = positions[person_id];
@@ -383,6 +384,7 @@ void communicationCompleted() {
 		<location id="id3" x="-2082" y="-1521">
 		</location>
 		<location id="id4" x="-1810" y="-1521">
+			<label kind="comments" x="-2822" y="-1487">non sarebbe meglio che questo stato sia committed? potrebbe essere che gli passi di fronte un civilian ma non lo veda in questo caso.</label>
 		</location>
 		<location id="id5" x="-1249" y="-1521">
 			<committed/>
@@ -707,50 +709,22 @@ bool checkNeighbor(int radius, int type){
 
 // Check if the civilian is near an exit
 bool amSafe() {
-    checkNeighbor(1, EXIT);
-}
-
-// Mark the civilian as saved on the map
-void safe() {
-    Position current_position = c_position[civilian_id];
-    map[current_position.r][current_position.c] = FREE;
-    // update any metrics or counters
+    return checkNeighbor(1, EXIT);
 }
 
 // Check if the civilian is near a fire
 bool amVictim() {
-    checkNeighbor(1, FIRE);
+    return checkNeighbor(1, FIRE);
 }
 
-// Mark the civilian as victim in need of assistance
-void victim() {
+void changeStateTo(int new_state){
     Position current_position = c_position[civilian_id];
-    map[current_position.r][current_position.c] = VICTIM;
-}
-
-// Mark the civilian as casualty on the map
-void casualty() {
-    Position current_position = c_position[civilian_id];
-    map[current_position.r][current_position.c] = FREE;
-    // You might want to add code here to update any metrics or counters
-}
-
-// Mark the civilian as in assistance
-void inAssistance() {
-    Position current_position = c_position[civilian_id];
-    map[current_position.r][current_position.c] = IN_ASSISTANCE;
-}
-
-// Mark the civilian as zero-responder
-void zeroResponder() {
-    Position current_position = c_position[civilian_id];
-    map[current_position.r][current_position.c] = ZERO_RESPONDER;
+    map[current_position.r][current_position.c] = new_state;
 }
 
 // Mark the civilian as in contact with a first-responder
 void inContact() {
-    // This function doesn't change the map state, but you might want to
-    // update some other variable or metric to track this state
+    // This function doesn't change the map state
 }
 
 // Find the closest first responder and update the private var
@@ -833,7 +807,7 @@ finishes helping themselves.</label>
 			<source ref="id53"/>
 			<target ref="id42"/>
 			<label kind="synchronisation" x="-1020" y="-1504">rescue_completed_msg[civilian_id]?</label>
-			<label kind="assignment" x="-773" y="-1487">safe()</label>
+			<label kind="assignment" x="-892" y="-1487">changeStateTo(SAFE)</label>
 			<nail x="-705" y="-1521"/>
 			<nail x="-2303" y="-1521"/>
 		</transition>
@@ -907,7 +881,7 @@ findClosestFirstResponder()</label>
 			<source ref="id51"/>
 			<target ref="id42"/>
 			<label kind="guard" x="-2286" y="-1470">x &gt;= tzr + getDistance(civilian_id,target_id)</label>
-			<label kind="assignment" x="-2286" y="-1453">safe()</label>
+			<label kind="assignment" x="-2286" y="-1453">changeStateTo(SAFE)</label>
 			<nail x="-2303" y="-1479"/>
 		</transition>
 		<transition id="id68">
@@ -920,7 +894,7 @@ findClosestFirstResponder()</label>
 			<target ref="id42"/>
 			<label kind="guard" x="-2286" y="-1368">x &gt;= tzr + getDistance(civilian_id,target_id)</label>
 			<label kind="synchronisation" x="-2287" y="-1351">rescue_completed_msg[target_id]!</label>
-			<label kind="assignment" x="-2286" y="-1334">safe()</label>
+			<label kind="assignment" x="-2286" y="-1334">changeStateTo(SAFE)</label>
 			<nail x="-1368" y="-1377"/>
 			<nail x="-2303" y="-1377"/>
 		</transition>
@@ -928,27 +902,27 @@ findClosestFirstResponder()</label>
 			<source ref="id45"/>
 			<target ref="id48"/>
 			<label kind="synchronisation" x="-1360" y="-1003">drone_msg_zero_responder[civilian_id]?</label>
-			<label kind="assignment" x="-1360" y="-986">zeroResponder()</label>
+			<label kind="assignment" x="-1360" y="-986">changeStateTo(ZERO_RESPONDER)</label>
 		</transition>
 		<transition id="id71">
 			<source ref="id47"/>
 			<target ref="id42"/>
 			<label kind="synchronisation" x="-2269" y="-1079">rescue_completed_msg[civilian_id]?</label>
-			<label kind="assignment" x="-2269" y="-1062">safe()</label>
+			<label kind="assignment" x="-2269" y="-1062">changeStateTo(SAFE)</label>
 		</transition>
 		<transition id="id72">
 			<source ref="id47"/>
 			<target ref="id46"/>
 			<label kind="guard" x="-2116" y="-1258">x &gt;= tv</label>
 			<label kind="synchronisation" x="-2116" y="-1224">casualty_msg[civilian_id]!</label>
-			<label kind="assignment" x="-2116" y="-1241">casualty()</label>
+			<label kind="assignment" x="-2116" y="-1241">changeStateTo(CASUALITY)</label>
 			<nail x="-2133" y="-1266"/>
 		</transition>
 		<transition id="id73">
 			<source ref="id44"/>
 			<target ref="id47"/>
 			<label kind="synchronisation" x="-2023" y="-1139">rescue_msg[cilian_id]?</label>
-			<label kind="assignment" x="-1989" y="-1122">inAssistance()</label>
+			<label kind="assignment" x="-2023" y="-1122">changeStateTo(IN_ASSISTANCE)</label>
 		</transition>
 		<transition id="id74">
 			<source ref="id44"/>
@@ -965,7 +939,7 @@ findClosestFirstResponder()</label>
 			<source ref="id43"/>
 			<target ref="id44"/>
 			<label kind="guard" x="-1708" y="-1037">amVictim()</label>
-			<label kind="assignment" x="-1708" y="-1020">victim(), x = 0</label>
+			<label kind="assignment" x="-1708" y="-1020">changeStateTo(VICTIM), x = 0</label>
 		</transition>
 		<transition id="id77">
 			<source ref="id41"/>
@@ -976,7 +950,7 @@ findClosestFirstResponder()</label>
 			<source ref="id41"/>
 			<target ref="id42"/>
 			<label kind="guard" x="-2388" y="-1037">amSafe()</label>
-			<label kind="assignment" x="-2371" y="-1020">safe()</label>
+			<label kind="assignment" x="-2482" y="-1020">changeStateTo(SAFE)</label>
 		</transition>
 		<transition id="id79">
 			<source ref="id40"/>
