@@ -25,7 +25,7 @@ const int MAX_ARRAY_SIZE = N_FIRST_RESPONDER + N_CIVILIAN;
 
 // ---- COMMUNICATION ----
 // Channel declaration
-chan broadcast initialization_completed;
+broadcast chan initialization_completed;
 urgent chan drone_msg_zero_responder[N_CIVILIAN];
 urgent chan drone_msg_contact_first_responder[N_CIVILIAN];
 urgent chan rescue_msg[N_CIVILIAN];
@@ -108,7 +108,7 @@ const int RIGHT = 0;
 const int DOWN = 0;
 const int LEFT = 0;
 
-// int DRONE = 2; NON c'è bisogno del drone perché nessuno deve leggere la posizione dei droni inoltre bisognerebbe aggiungere una ulteriore costante per indicare quando il drone si trova sopra a qualcun / qualcos altro che è un casotto. Così prendiamo due piccioni con una fava visto che non dobbiamo neanche aggiornare la posizione del drone sulla mappa.
+// int DRONE - NON c'è bisogno del drone perché nessuno deve leggere la posizione dei droni
 
 Position c_position[N_CIVILIAN]; // civilians positions
 Position d_position[N_DRONE]; // drones positions
@@ -384,7 +384,6 @@ void communicationCompleted() {
 		<location id="id3" x="-2082" y="-1521">
 		</location>
 		<location id="id4" x="-1810" y="-1521">
-			<label kind="comments" x="-2822" y="-1487">non sarebbe meglio che questo stato sia committed? potrebbe essere che gli passi di fronte un civilian ma non lo veda in questo caso.</label>
 		</location>
 		<location id="id5" x="-1249" y="-1521">
 			<committed/>
@@ -768,7 +767,6 @@ void findClosestFirstResponder() {
 		<location id="id45" x="-1368" y="-935">
 			<label kind="comments" x="-1351" y="-892">Will choose an urgent channel first.
 Only one of the 2 channels can be active in a time instant.</label>
-			<committed/>
 		</location>
 		<location id="id46" x="-1716" y="-1266">
 			<name x="-1750" y="-1300">Casualty</name>
@@ -807,20 +805,20 @@ finishes helping themselves.</label>
 			<source ref="id53"/>
 			<target ref="id42"/>
 			<label kind="synchronisation" x="-1020" y="-1504">rescue_completed_msg[civilian_id]?</label>
-			<label kind="assignment" x="-892" y="-1487">changeStateTo(SAFE)</label>
+			<label kind="assignment" x="-884" y="-1487">changeStateTo(SAFE)</label>
 			<nail x="-705" y="-1521"/>
 			<nail x="-2303" y="-1521"/>
 		</transition>
 		<transition id="id57">
 			<source ref="id54"/>
 			<target ref="id53"/>
-			<label kind="synchronisation" x="-1249" y="-1224">civilian_contact_msg[closest_first_responder_id - N_CIVILIAN]!</label>
-			<label kind="assignment" x="-1292" y="-1207">sendMessageDouble(target_id,civilian_id,closest_first_responder_id)</label>
+			<label kind="synchronisation" x="-1258" y="-1224">civilian_contact_msg[closest_first_responder_id - N_CIVILIAN]!</label>
+			<label kind="assignment" x="-1300" y="-1207">sendMessageDouble(target_id,civilian_id,closest_first_responder_id)</label>
 		</transition>
 		<transition id="id58">
 			<source ref="id50"/>
 			<target ref="id54"/>
-			<label kind="assignment" x="-1079" y="-1096">target_id = readMessageSingle(civilian_id),
+			<label kind="assignment" x="-1088" y="-1096">target_id = readMessageSingle(civilian_id),
 findClosestFirstResponder()</label>
 		</transition>
 		<transition id="id59">
@@ -838,7 +836,7 @@ findClosestFirstResponder()</label>
 			<source ref="id45"/>
 			<target ref="id50"/>
 			<label kind="synchronisation" x="-1105" y="-926">drone_msg_contact_first_responder[civilian_id]?</label>
-			<label kind="assignment" x="-799" y="-909">inContact()</label>
+			<label kind="assignment" x="-790" y="-909">inContact()</label>
 			<nail x="-705" y="-935"/>
 		</transition>
 		<transition id="id62">
@@ -875,7 +873,7 @@ findClosestFirstResponder()</label>
 		<transition id="id66">
 			<source ref="id45"/>
 			<target ref="id52"/>
-			<label kind="guard" x="-1521" y="-875">canMoveAnywhere()</label>
+			<label kind="guard" x="-1521" y="-850">canMoveAnywhere()</label>
 		</transition>
 		<transition id="id67">
 			<source ref="id51"/>
