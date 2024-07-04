@@ -17,10 +17,22 @@ const int civilian_tvs[N_CIVILIAN] = {2,2,2};
 const int civilians_tzrs[N_CIVILIAN] = {2,2,2};
 
 // Variable Declaration
-int map[N_ROW][N_COL];
+// map initialization: the top left cell is at position (0,0) and the bottom right is at (N_ROW - 1, N_COL - 1)
+int map[N_ROW][N_COL] = {
+        {0,0,0,0,0,0,0,2},
+        {0,1,1,0,0,0,0,0},
+        {0,1,1,7,0,0,0,0},
+        {0,0,1,1,0,0,0,0},
+        {0,3,0,0,0,0,0,0}, 
+        {0,0,0,0,0,3,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,2,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,4,4}
+ };
+
 const int MAX_ARRAY_SIZE = N_FIRST_RESPONDER + N_CIVILIAN;
 
-// Albi: da fare :)
 int drone_ids[N_DRONE]; // Bisogna inizializzare con dei valori univoci prima dell'avvio del system declarations
 int civialian_ids[N_CIVILIAN]; // DA 0 a N_CIVILIAN - 1
 int first_responder_ids[N_FIRST_RESPONDER]; // DA N_CIVILIAN A N_CIVILIAN + N_FIRST_RESPONDER - 1
@@ -176,27 +188,11 @@ void initializePositions() {
     f_position[1] = d2;
     f_position[2] = d3;
 
-    // map initialization the top left cell is at position (0,0) and the bottom right is at (N_ROW - 1, N_COL - 1)
-    map = {
-        {0,0,0,0,0,0,0,2},
-        {0,1,1,0,0,0,0,0},
-        {0,1,1,7,0,0,0,0},
-        {0,0,1,1,0,0,0,0},
-        {0,3,0,0,0,0,0,0},
-        {0,0,0,0,0,3,0,0},
-        {0,0,0,0,0,0,0,0},
-        {0,0,2,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,4,4},
-    }
-
 }
 
 // checks if a entity can move in the provided direction
-// positions is the array that containts the position for the various Templates i.e. Drone, FirstResponder, Civilian
-bool canMoveGeneral(int direction, int&amp; positions[MAX_ARRAY_SIZE], int person_id) {
+bool canMove(int direction, position current_position) {
 
-    position current_position = positions[person_id];
     int new_r = current_position.r;
     int new_c = current_position.c;
 
@@ -207,29 +203,48 @@ bool canMoveGeneral(int direction, int&amp; positions[MAX_ARRAY_SIZE], int perso
     else if (direction == LEFT) new_c--;
 
     // Check if new position is within grid bounds
-    if (new_r &lt; 0 || new_r &gt;= GRID_SIZE || new_c &lt; 0 || new_c &gt;= GRID_SIZE) 
+    if (new_r &lt; 0 || new_r &gt;= N_ROW || new_c &lt; 0 || new_c &gt;= N_COL) 
         return false;
 
     // Check if new position is empty in the grid
-    if (grid[new_r][new_c] != 0) 
+    if (map[new_r][new_c] != 0) 
         return false;
-
-    // Check if any other person is in the target position (redundant as the grid check is sufficient)
-    //for (i : int[0, N_PERSONS-1]) {
-    //    if (i != person_id &amp;&amp; 
-    //        p_position[i].r == new_r &amp;&amp; 
-    //        p_position[i].c == new_c) {
-    //        return false;
-    //    }
-    //}
 
     return true;
 }
 
+position getNewPosition(int direction, position old_position){
+    position new_position;
+
+    int new_r = old_position.r;
+    int new_c = old_position.c;
+
+    // Calculate new position based on direction
+    if (direction == UP) new_r++;
+    else if (direction == RIGHT) new_c++;
+    else if (direction == DOWN) new_r--;
+    else if (direction == LEFT) new_c--;
+
+    
+    new_position.r = new_r;
+    new_position.c = new_c;
+
+    return new_position;
+}
+
+void updateMap(int value, position cell){
+    map[cell.r][cell.c] = value;
+}
+
+void move(){
+
+}
+
 // move in the provided direction
 // positions is the array that containts the position for the various Templates i.e. Drone, FirstResponder, Civilian
-void moveGeneral(int direction, int&amp; positions[MAX_ARRAY_SIZE], int person_id) {
+void moveGeneral(int direction, position &amp;positions[N_CIVILIAN], int person_id) {
 
+    
     position current_position = positions[person_id];
     int new_r = current_position.r;
     int new_c = current_position.c;
@@ -245,33 +260,9 @@ void moveGeneral(int direction, int&amp; positions[MAX_ARRAY_SIZE], int person_i
     positions[person_id].c = new_c;
 
     // Update grid
-    grid[new_r][new_c] = 1;  // occupy new position
-    grid[current_position.r][current_position.c] = 0;  // free old position
+    map[new_r][new_c] = 1;  // occupy new position
+    map[current_position.r][current_position.c] = 0;  // free old position
 
-}
-
-// Checks wether there is an entity of "type" in the "radius"
-bool checkNeighbor(int radius, int type){
-    position current_position = c_position[civilian_id];
-    int row, col;
-    
-    // Check all adjacent cells (including diagonals)
-    for (row = current_position.r - radius; row &lt;= current_position.r + radius; row++) {
-        for (col = current_position.c - radius; col &lt;= current_position.c + radius; col++) {
-            // Skip checking the current position
-            if (row == current_position.r &amp;&amp; col == current_position.c) {
-                continue;
-            }
-            
-            // Check if the cell is within the grid boundaries
-            if (row &gt;= 0 &amp;&amp; row &lt; N_ROW &amp;&amp; col &gt;= 0 &amp;&amp; col &lt; N_COL) {
-                if (map[row][col] == type) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
 }
 
 // Helper function to calculate Manhattan distance
@@ -281,15 +272,29 @@ int getDistance(position pos1, position pos2) {
     return (dr &gt; 0 ? dr : -dr) + (dc &gt; 0 ? dc : -dc);
 }
 
+// gets the distance between 2 civialians indipendent of their states
+int getDistanceCC(int c1_id, int c2_id) {
+    position position_c1 = c_position[c1_id];
+    position position_c2 = c_position[c2_id];
+    return getDistance(position_c1, position_c2);
+}
+
+// gets the distance between a civialian and a first responder indipendent of their states
+int getDistanceCF(int c_id, int fr_id){
+    position position_c = c_position[c_id];
+    position position_fr = f_position[fr_id];
+    return getDistance(position_c, position_fr);
+}
+
 // ---- HELPER FUNCTIONS FOR THE QUERIES ----
 
 // checks that the positions of the civialins are different
 bool areDifferent(){
 
   position p;
-  for (i : int[0,N_PERSONS-1]) {
+  for (i : int[0,N_CIVILIAN-1]) {
     p = c_position[i];
-    for (j : int[0,N_PERSONS-1]) {
+    for (j : int[0,N_CIVILIAN-1]) {
         if(p.r == c_position[j].r &amp;&amp; p.c == c_position[j].c &amp;&amp; i != j &amp;&amp; p.r != 0 &amp;&amp; p.c != 0) {
             return false;
         }
@@ -352,45 +357,42 @@ void move() {
 void detect() {
     int closest_survivor_distance = drone_nvs[drone_id] + 1; // Initialize with a distance greater than Nv
     int closest_victim_distance = drone_nvs[drone_id] + 1;
-
     position current_position = d_position[drone_id];
-    int row, col, distance;
+    int row, col, distance, i;
     
     // Reset detection variables
     detected_survivor_id = -1;
     detected_victim_id = -1;
     
-    // Scan a Nv-cell radius around the drone
-    for (row : int[current_position.r - drone_Nv, current_position.r + drone_Nv]) {
-        for (col : int[current_position.c - drone_Nv, current_position.c + drone_Nv]) {
-            // Check if the cell is within the grid boundaries
-            if (row &gt;= 0 &amp;&amp; row &lt; N_ROW &amp;&amp; col &gt;= 0 &amp;&amp; col &lt; N_COL) {
-                position cell_position;
-                cell_position.r = row;
-                cell_position.c = col;
-                distance = getDistance(current_position, cell_position);
-                
+    // Scan the entire grid, but only consider cells within Nv distance
+    for (row = 0; row &lt; N_ROW; row++) {
+        for (col = 0; col &lt; N_COL; col++) {
+            position cell_position = {row, col};
+            distance = getDistance(current_position, cell_position);
+            
+            // Only process cells within drone_Nv distance
+            if (distance &lt;= drone_Nv) {
                 // Check for survivors (CIVILIAN)
                 if (map[row][col] == CIVILIAN) {
-                    for (i : int[0, N_FIRST_RESPONDER - 1]) {
+                    for (i = 0; i &lt; N_FIRST_RESPONDER; i++) {
                         if (c_position[i].r == row &amp;&amp; c_position[i].c == col) {
                             if (distance &lt; closest_survivor_distance) {
                                 detected_survivor_id = i;
                                 closest_survivor_distance = distance;
                             }
-                            break;
+                            //break;
                         }
-                    }
+                    } 
                 }
                 // Check for victims (VICTIM)
                 else if (map[row][col] == VICTIM) {
-                    for (i : int[0, N_CIVILIAN - 1]) {
+                    for (i = 0; i &lt; N_CIVILIAN; i++) {
                         if (c_position[i].r == row &amp;&amp; c_position[i].c == col) {
                             if (distance &lt; closest_victim_distance) {
                                 detected_victim_id = i;
                                 closest_victim_distance = distance;
                             }
-                            break;
+                            //break;
                         }
                     }
                 }
@@ -474,12 +476,15 @@ int detected_victim_id = -1;
 int contacting_survivor_id = -1;
 
 // ---- Private First-Responder's functions ----
-bool canMove(int direction) {
-    return canMoveGeneral(direction, f_position, Id);
-}
 
 void move(int direction){
-    moveGeneral(direction, f_position, Id);
+    position current_position = f_position[first_responder_id];
+    position new_position = getNewPosition(direction, current_position);
+    // update array
+    f_position[first_responder_id] = new_position;
+    // update map
+    updateMap(FREE, current_position);
+    updateMap(FIRST_RESPONDER, new_position);
 }
 
 // Checks if there is a victim within a 1-cell range.
@@ -496,13 +501,9 @@ void detect() {
     // Check all adjacent cells (including diagonals)
     for (row = current_position.r - 1; row &lt;= current_position.r + 1; row++) {
         for (col = current_position.c - 1; col &lt;= current_position.c + 1; col++) {
-            // Skip checking the current position
-            if (row == current_position.r &amp;&amp; col == current_position.c) {
-                continue;
-            }
             
             // Check if the cell is within the grid boundaries
-            if (row &gt;= 0 &amp;&amp; row &lt; N_ROW &amp;&amp; col &gt;= 0 &amp;&amp; col &lt; N_COL) {
+            if (row &gt;= 0 &amp;&amp; row &lt; N_ROW &amp;&amp; col &gt;= 0 &amp;&amp; col &lt; N_COL &amp;&amp; row == current_position.r &amp;&amp; col == current_position.c) {
                 // Check if the cell contains a victim
                 if (map[row][col] == VICTIM) {
                     // Find which civilian is at this position
@@ -551,13 +552,13 @@ void readMessageFromContactingCivilian() {
 		<location id="id22" x="-1819" y="-1444">
 			<name x="-1802" y="-1470">Assisting_Contact</name>
 			<label kind="invariant" x="-1802" y="-1436">x &lt;= tfr
-+ getDistance(contacting_survivor_id,first_responder_id)
-+ getDistance(first_responder_id,detected_victim_id)</label>
++ getDistanceCF(contacting_survivor_id,first_responder_id)
++ getDistanceCF(detected_victim_id, first_responder_id)</label>
 		</location>
 		<location id="id23" x="-1819" y="-960">
 			<label kind="invariant" x="-1810" y="-943">x &lt;= tfr
-+ getDistance(contacting_survivor_id,first_responder_id)
-+ getDistance(first_responder_id,detected_victim_id)</label>
++ getDistanceCF(contacting_survivor_id,first_responder_id)
++ getDistanceCF(detected_victim_id, first_responder_id)</label>
 			<label kind="comments" x="-1802" y="-1011">If the victim dies
 =&gt; Finish rescue of the contacting_survivor</label>
 		</location>
@@ -569,8 +570,8 @@ void readMessageFromContactingCivilian() {
 			<source ref="id22"/>
 			<target ref="id24"/>
 			<label kind="guard" x="-1802" y="-1351">x &gt;= tfr
-+ getDistance(contacting_survivor_id,first_responder_id)
-+ getDistance(first_responder_id,detected_victim_id)</label>
++ getDistanceCF(contacting_survivor_id,first_responder_id)
++ getDistanceCF(detected_victim_id, first_responder_id)</label>
 			<label kind="synchronisation" x="-1802" y="-1292">rescue_completed_msg[detected_victim_id]!</label>
 			<nail x="-1819" y="-1249"/>
 		</transition>
@@ -585,7 +586,7 @@ void readMessageFromContactingCivilian() {
 			<source ref="id18"/>
 			<target ref="id19"/>
 			<label kind="select" x="-1003" y="-1581">direction : int[0,3]</label>
-			<label kind="guard" x="-1003" y="-1564">canMove(direction) &amp;&amp; !foundVictim()</label>
+			<label kind="guard" x="-1003" y="-1564">canMove(direction, f_position[first_responder_id]) &amp;&amp; !foundVictim()</label>
 			<label kind="assignment" x="-1003" y="-1547">move(direction)</label>
 			<nail x="-1020" y="-1513"/>
 			<nail x="-1300" y="-1513"/>
@@ -594,8 +595,8 @@ void readMessageFromContactingCivilian() {
 			<source ref="id23"/>
 			<target ref="id19"/>
 			<label kind="guard" x="-1283" y="-1138">x &gt;= tfr
-+ getDistance(contacting_survivor_id,first_responder_id)
-+ getDistance(first_responder_id,detected_victim_id)</label>
++ getDistanceCF(contacting_survivor_id,first_responder_id)
++ getDistanceCF(detected_victim_id, first_responder_id)</label>
 			<label kind="synchronisation" x="-1283" y="-1070">rescue_completed_msg[contacting_survivor_id]!</label>
 			<label kind="assignment" x="-1283" y="-1045">prepareNewRescue()</label>
 			<nail x="-1300" y="-960"/>
@@ -604,8 +605,8 @@ void readMessageFromContactingCivilian() {
 			<source ref="id22"/>
 			<target ref="id23"/>
 			<label kind="guard" x="-1810" y="-1138">x &lt; tfr
-+ getDistance(contacting_survivor_id,first_responder_id)
-+ getDistance(first_responder_id,detected_victim_id)</label>
++ getDistanceCF(contacting_survivor_id,first_responder_id)
++ getDistanceCF(detected_victim_id, first_responder_id)</label>
 			<label kind="synchronisation" x="-1810" y="-1070">casualty_msg[detected_victim_id]?</label>
 		</transition>
 		<transition id="id30">
@@ -661,14 +662,38 @@ x = 0</label>
 clock x;
 int target_id = -1;
 int closest_first_responder_id = -1;
+int currentState = -1;
 
 // ---- Private Civilian's variables ----
-bool canMove(int direction) {
-    return canMoveGeneral(direction, c_position, Id);
-}
 
 void move(int direction){
-    moveGeneral(direction, c_position, Id);
+    position current_position = c_position[civilian_id];
+    position new_position = getNewPosition(direction, current_position);
+    // update array
+    f_position[civilian_id] = new_position;
+    // update map
+    updateMap(FREE, current_position);
+    updateMap(currentState, new_position);
+}
+
+// Checks wether there is an entity of "type" in the "radius"
+bool checkNeighbor(int radius, int type){
+    position current_position = c_position[civilian_id];
+    int row, col;
+    
+    // Check all adjacent cells (including diagonals)
+    for (row = current_position.r - radius; row &lt;= current_position.r + radius; row++) {
+        for (col = current_position.c - radius; col &lt;= current_position.c + radius; col++) {
+            
+            // Check if the cell is within the grid boundaries
+            if (row &gt;= 0 &amp;&amp; row &lt; N_ROW &amp;&amp; col &gt;= 0 &amp;&amp; col &lt; N_COL &amp;&amp; row != current_position.r &amp;&amp; col != current_position.c) {
+                if (map[row][col] == type) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 // Check if the civilian is near an exit
@@ -683,7 +708,8 @@ bool amVictim() {
 
 void changeStateTo(int new_state){
     position current_position = c_position[civilian_id];
-    map[current_position.r][current_position.c] = new_state;
+    currentState = new_state;
+    updateMap(new_state, current_position);
 }
 
 // Find the closest first responder and update the private var
@@ -692,16 +718,18 @@ void findClosestFirstResponder() {
     int closest_distance = N_ROW + N_COL + 1; // Initialize with maximum possible distance
     int i;
     for (i = 0; i &lt; N_FIRST_RESPONDER; i++) {
-        position responder_position = f_position[i];
+        position fr_position = f_position[i];
 
-        int distance = getDistance(current_position, responder_position);
+        int distance = getDistance(current_position, fr_position);
         
         if (distance &lt; closest_distance) {
             closest_distance = distance;
-            closest_first_responder_id = first_responder_id[i];
+            closest_first_responder_id = i;
         }
     }
-}</declaration>
+}
+
+</declaration>
 		<location id="id37" x="-2660" y="-935">
 		</location>
 		<location id="id38" x="-2303" y="-935">
@@ -733,7 +761,7 @@ Only one of the 2 channels can be active in a time instant.</label>
 		</location>
 		<location id="id46" x="-1368" y="-1309">
 			<name x="-1496" y="-1334">ZeroResponder</name>
-			<label kind="invariant" x="-1564" y="-1292">x &lt;= tzr + getDistance(civilian_id,target_id)</label>
+			<label kind="invariant" x="-1564" y="-1292">x &lt;= tzr + getDistanceCC(civilian_id,target_id)</label>
 		</location>
 		<location id="id47" x="-705" y="-1045">
 			<committed/>
@@ -756,7 +784,7 @@ finishes helping themselves.</label>
 			<source ref="id42"/>
 			<target ref="id38"/>
 			<label kind="select" x="-1564" y="-884">direction : int[0,3]</label>
-			<label kind="guard" x="-1547" y="-858">canMove(direction)</label>
+			<label kind="guard" x="-1751" y="-858">canMove(direction, c_position[civilian_id])</label>
 			<label kind="assignment" x="-1521" y="-833">move(direction)</label>
 			<nail x="-1368" y="-799"/>
 			<nail x="-2303" y="-799"/>
@@ -802,7 +830,7 @@ findClosestFirstResponder()</label>
 		<transition id="id59">
 			<source ref="id48"/>
 			<target ref="id39"/>
-			<label kind="guard" x="-2286" y="-1470">x &gt;= tzr + getDistance(civilian_id,target_id)</label>
+			<label kind="guard" x="-2286" y="-1470">x &gt;= tzr + getDistanceCC(civilian_id,target_id)</label>
 			<label kind="assignment" x="-2286" y="-1453">changeStateTo(SAFE)</label>
 			<nail x="-2303" y="-1479"/>
 		</transition>
@@ -814,7 +842,7 @@ findClosestFirstResponder()</label>
 		<transition id="id61">
 			<source ref="id46"/>
 			<target ref="id39"/>
-			<label kind="guard" x="-2286" y="-1368">x &gt;= tzr + getDistance(civilian_id,target_id)</label>
+			<label kind="guard" x="-2286" y="-1368">x &gt;= tzr + getDistanceCC(civilian_id,target_id)</label>
 			<label kind="synchronisation" x="-2287" y="-1351">rescue_completed_msg[target_id]!</label>
 			<label kind="assignment" x="-2286" y="-1334">changeStateTo(SAFE)</label>
 			<nail x="-1368" y="-1377"/>
