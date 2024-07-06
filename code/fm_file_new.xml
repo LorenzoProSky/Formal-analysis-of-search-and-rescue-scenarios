@@ -94,8 +94,8 @@ void initializePositions() {
     c_position[2] = c2;
 
     // initialize first responders positions
-    f0.r = 0;
-    f0.c = 7;
+    f0.r = 2;
+    f0.c = 5;
     f1.r = 7;
     f1.c = 2;
     f_position[0] = f0;
@@ -315,10 +315,7 @@ void detect() {
     int closest_victim_distance = drone_nvs[drone_id] + 1;
     position current_position = d_position[drone_id];
     int row, col, distance, i;
-    
-    // Reset detection variables
-    detected_survivor_id = -1;
-    detected_victim_id = -1;
+    int nv = drone_nvs[drone_id];
     
     // Scan the entire grid, but only consider cells within Nv distance
     for (row = 0; row &lt; N_ROW; row++) {
@@ -327,7 +324,7 @@ void detect() {
             distance = getDistance(current_position, cell_position);
             
             // Only process cells within drone_Nv distance
-            if (distance &lt;= N_DRONE) {
+            if (distance &lt;= nv) {
                 // Check for survivors (CIVILIAN)
                 if (map[row][col] == CIVILIAN) {
                     for (i = 0; i &lt; N_FIRST_RESPONDER; i++) {
@@ -360,6 +357,11 @@ void detect() {
 bool foundCivilians() {
     if(detected_survivor_id != -1 &amp;&amp; detected_victim_id != -1) return true;
     return false;
+}
+
+void prepareNewContact() {
+    detected_survivor_id = -1;
+    detected_victim_id = -1;
 }</declaration>
 		<location id="id3" x="-2082" y="-1521">
 		</location>
@@ -397,6 +399,7 @@ bool foundCivilians() {
 		<transition id="id11">
 			<source ref="id8"/>
 			<target ref="id4"/>
+			<label kind="assignment" x="-1989" y="-1615">prepareNewContact()</label>
 		</transition>
 		<transition id="id12">
 			<source ref="id7"/>
@@ -453,15 +456,12 @@ void detect() {
     position current_position = f_position[first_responder_id];
     int row, col;
     
-    // Reset detection variable
-    detected_victim_id = -1;
-    
     // Check all adjacent cells (including diagonals)
     for (row = current_position.r - 1; row &lt;= current_position.r + 1; row++) {
         for (col = current_position.c - 1; col &lt;= current_position.c + 1; col++) {
             
             // Check if the cell is within the grid boundaries
-            if (row &gt;= 0 &amp;&amp; row &lt; N_ROW &amp;&amp; col &gt;= 0 &amp;&amp; col &lt; N_COL &amp;&amp; row == current_position.r &amp;&amp; col == current_position.c) {
+            if (row &gt;= 0 &amp;&amp; row &lt; N_ROW &amp;&amp; col &gt;= 0 &amp;&amp; col &lt; N_COL) {
                 // Check if the cell contains a victim
                 if (map[row][col] == VICTIM) {
                     // Find which civilian is at this position
@@ -469,7 +469,7 @@ void detect() {
                     for (i = 0; i &lt; N_CIVILIAN; i++) {
                         if (c_position[i].r == row &amp;&amp; c_position[i].c == col) {
                             detected_victim_id = i;
-                            return; // Exit the function after finding the first victim
+                           return; // Exit the function after finding the first victim
                         }
                     }
                 }
@@ -526,8 +526,16 @@ void readMessageFromContactingCivilian() {
 		<location id="id24" x="-1734" y="-1249">
 			<committed/>
 		</location>
+		<location id="id25" x="-1020" y="-1462">
+			<name x="-1003" y="-1487">Wandering</name>
+		</location>
 		<init ref="id17"/>
-		<transition id="id25">
+		<transition id="id26">
+			<source ref="id18"/>
+			<target ref="id25"/>
+			<label kind="guard" x="-1011" y="-1547">!foundVictim()</label>
+		</transition>
+		<transition id="id27">
 			<source ref="id22"/>
 			<target ref="id24"/>
 			<label kind="guard" x="-1981" y="-1351">x &gt;= tfr
@@ -536,23 +544,22 @@ void readMessageFromContactingCivilian() {
 			<label kind="synchronisation" x="-1981" y="-1292">rescue_completed_msg[detected_victim_id]!</label>
 			<nail x="-1998" y="-1249"/>
 		</transition>
-		<transition id="id26">
+		<transition id="id28">
 			<source ref="id24"/>
 			<target ref="id19"/>
 			<label kind="synchronisation" x="-1717" y="-1241">rescue_completed_msg[contacting_survivor_id]!</label>
 			<label kind="assignment" x="-1717" y="-1224">prepareNewRescue()</label>
 			<nail x="-1300" y="-1249"/>
 		</transition>
-		<transition id="id27">
-			<source ref="id18"/>
+		<transition id="id29">
+			<source ref="id25"/>
 			<target ref="id19"/>
-			<label kind="select" x="-1011" y="-1564">direction : int[0,3]</label>
-			<label kind="guard" x="-1011" y="-1538">canMove(direction, f_position[first_responder_id]) &amp;&amp; !foundVictim()</label>
-			<label kind="assignment" x="-1011" y="-1513">move(direction)</label>
-			<nail x="-1020" y="-1436"/>
-			<nail x="-1300" y="-1436"/>
+			<label kind="select" x="-1283" y="-1453">direction : int[0,3]</label>
+			<label kind="guard" x="-1283" y="-1436">canMove(direction,f_position[first_responder_id])</label>
+			<label kind="assignment" x="-1283" y="-1419">move(direction)</label>
+			<nail x="-1300" y="-1462"/>
 		</transition>
-		<transition id="id28">
+		<transition id="id30">
 			<source ref="id23"/>
 			<target ref="id19"/>
 			<label kind="guard" x="-1283" y="-1138">x &gt;= tfr
@@ -562,7 +569,7 @@ void readMessageFromContactingCivilian() {
 			<label kind="assignment" x="-1283" y="-1045">prepareNewRescue()</label>
 			<nail x="-1300" y="-960"/>
 		</transition>
-		<transition id="id29">
+		<transition id="id31">
 			<source ref="id22"/>
 			<target ref="id23"/>
 			<label kind="guard" x="-1989" y="-1138">x &lt; tfr
@@ -570,25 +577,25 @@ void readMessageFromContactingCivilian() {
 + getDistanceCF(detected_victim_id,first_responder_id)</label>
 			<label kind="synchronisation" x="-1989" y="-1070">casualty_msg[detected_victim_id]?</label>
 		</transition>
-		<transition id="id30">
+		<transition id="id32">
 			<source ref="id21"/>
 			<target ref="id22"/>
 			<label kind="assignment" x="-1981" y="-1546">readMessageFromContactingCivilian(),
 x = 0</label>
 		</transition>
-		<transition id="id31">
+		<transition id="id33">
 			<source ref="id19"/>
 			<target ref="id21"/>
 			<label kind="synchronisation" x="-1844" y="-1598">civilian_contact_msg[first_responder_id]?</label>
 		</transition>
-		<transition id="id32">
+		<transition id="id34">
 			<source ref="id18"/>
 			<target ref="id20"/>
 			<label kind="guard" x="-824" y="-1665">foundVictim()</label>
 			<label kind="synchronisation" x="-824" y="-1648">rescue_msg[detected_victim_id]!</label>
 			<label kind="assignment" x="-824" y="-1631">x = 0</label>
 		</transition>
-		<transition id="id33">
+		<transition id="id35">
 			<source ref="id20"/>
 			<target ref="id19"/>
 			<label kind="guard" x="-399" y="-1810">x &lt; tfr</label>
@@ -605,7 +612,7 @@ Optimistic assumption
 			<nail x="-325" y="-1818"/>
 			<nail x="-1300" y="-1818"/>
 		</transition>
-		<transition id="id34">
+		<transition id="id36">
 			<source ref="id20"/>
 			<target ref="id19"/>
 			<label kind="guard" x="-410" y="-1716">x &gt;= tfr</label>
@@ -614,16 +621,16 @@ Optimistic assumption
 			<nail x="-325" y="-1725"/>
 			<nail x="-1300" y="-1725"/>
 		</transition>
-		<transition id="id35">
+		<transition id="id37">
 			<source ref="id19"/>
 			<target ref="id18"/>
 			<label kind="assignment" x="-1198" y="-1631">detect()</label>
 		</transition>
-		<transition id="id36">
+		<transition id="id38">
 			<source ref="id17"/>
 			<target ref="id19"/>
 			<label kind="synchronisation" x="-1623" y="-1708">initialization_completed?</label>
-			<label kind="assignment" x="-1895" y="-1691">updateMap(FIRST_RESPONDER, f_position[first_responder_id])</label>
+			<label kind="assignment" x="-1904" y="-1691">updateMap(FIRST_RESPONDER,f_position[first_responder_id])</label>
 		</transition>
 	</template>
 	<template>
@@ -701,185 +708,185 @@ void findClosestFirstResponder() {
 }
 
 </declaration>
-		<location id="id37" x="-2788" y="-935">
+		<location id="id39" x="-2788" y="-935">
 		</location>
-		<location id="id38" x="-2380" y="-935">
+		<location id="id40" x="-2380" y="-935">
 			<committed/>
 		</location>
-		<location id="id39" x="-2380" y="-1096">
+		<location id="id41" x="-2380" y="-1096">
 			<name x="-2439" y="-1105">Safe</name>
 		</location>
-		<location id="id40" x="-1716" y="-935">
+		<location id="id42" x="-1716" y="-935">
 			<committed/>
 		</location>
-		<location id="id41" x="-1716" y="-1096">
+		<location id="id43" x="-1716" y="-1096">
 			<name x="-1700" y="-1122">Victim</name>
 			<label kind="invariant" x="-1700" y="-1088">x &lt;= tv</label>
 		</location>
-		<location id="id42" x="-1368" y="-935">
+		<location id="id44" x="-1368" y="-935">
 			<name x="-1411" y="-960">Idle</name>
 			<label kind="comments" x="-1351" y="-892">Will choose an urgent channel first.
 Only one of the 2 channels can be active in a time instant.</label>
 		</location>
-		<location id="id43" x="-1717" y="-1266">
+		<location id="id45" x="-1717" y="-1266">
 			<name x="-1751" y="-1300">Casualty</name>
 		</location>
-		<location id="id44" x="-2023" y="-1096">
+		<location id="id46" x="-2023" y="-1096">
 			<label kind="invariant" x="-2048" y="-1079">x &lt;= tv</label>
 		</location>
-		<location id="id45" x="-1368" y="-1045">
+		<location id="id47" x="-1368" y="-1045">
 			<committed/>
 		</location>
-		<location id="id46" x="-1368" y="-1309">
+		<location id="id48" x="-1368" y="-1309">
 			<name x="-1496" y="-1334">ZeroResponder</name>
 			<label kind="invariant" x="-1351" y="-1300">x &lt;= tzr + getDistanceCC(civilian_id,target_id)</label>
 		</location>
-		<location id="id47" x="-578" y="-1045">
+		<location id="id49" x="-578" y="-1045">
 			<committed/>
 		</location>
-		<location id="id48" x="-1368" y="-1479">
+		<location id="id50" x="-1368" y="-1479">
 			<label kind="invariant" x="-1351" y="-1479">x &lt;= tzr + getDistanceCC(civilian_id,target_id)</label>
 			<label kind="comments" x="-1717" y="-1470">If the victim dies, the zero-responder
 finishes helping themselves.</label>
 		</location>
-		<location id="id49" x="-578" y="-1309">
+		<location id="id51" x="-578" y="-1309">
 			<name x="-680" y="-1334">Contacting</name>
 		</location>
-		<location id="id50" x="-578" y="-1147">
+		<location id="id52" x="-578" y="-1147">
 			<committed/>
 		</location>
-		<location id="id51" x="-1368" y="-1156">
+		<location id="id53" x="-1368" y="-1156">
 			<committed/>
 		</location>
-		<init ref="id37"/>
-		<transition id="id52">
-			<source ref="id42"/>
-			<target ref="id38"/>
+		<init ref="id39"/>
+		<transition id="id54">
+			<source ref="id44"/>
+			<target ref="id40"/>
 			<label kind="select" x="-1556" y="-867">direction : int[0,3]</label>
-			<label kind="guard" x="-1759" y="-850">canMove(direction, c_position[civilian_id])</label>
+			<label kind="guard" x="-1751" y="-850">canMove(direction,c_position[civilian_id])</label>
 			<label kind="assignment" x="-1513" y="-833">move(direction)</label>
 			<nail x="-1368" y="-799"/>
 			<nail x="-2380" y="-799"/>
 		</transition>
-		<transition id="id53">
-			<source ref="id49"/>
-			<target ref="id39"/>
+		<transition id="id55">
+			<source ref="id51"/>
+			<target ref="id41"/>
 			<label kind="synchronisation" x="-893" y="-1504">rescue_completed_msg[civilian_id]?</label>
 			<label kind="assignment" x="-757" y="-1487">changeStateTo(SAFE)</label>
 			<nail x="-578" y="-1521"/>
 			<nail x="-2380" y="-1521"/>
 		</transition>
-		<transition id="id54">
-			<source ref="id50"/>
-			<target ref="id49"/>
+		<transition id="id56">
+			<source ref="id52"/>
+			<target ref="id51"/>
 			<label kind="synchronisation" x="-1028" y="-1224">civilian_contact_msg[closest_first_responder_id]!</label>
 			<label kind="assignment" x="-1181" y="-1207">sendMessageDouble(target_id,civilian_id,closest_first_responder_id)</label>
 		</transition>
-		<transition id="id55">
-			<source ref="id47"/>
-			<target ref="id50"/>
+		<transition id="id57">
+			<source ref="id49"/>
+			<target ref="id52"/>
 			<label kind="assignment" x="-961" y="-1096">target_id = readMessageSingle(civilian_id),
 findClosestFirstResponder()</label>
 		</transition>
-		<transition id="id56">
-			<source ref="id51"/>
-			<target ref="id46"/>
+		<transition id="id58">
+			<source ref="id53"/>
+			<target ref="id48"/>
 			<label kind="synchronisation" x="-1360" y="-1258">rescue_msg[target_id]!</label>
 			<label kind="assignment" x="-1360" y="-1241">x = 0</label>
 		</transition>
-		<transition id="id57">
-			<source ref="id45"/>
-			<target ref="id51"/>
+		<transition id="id59">
+			<source ref="id47"/>
+			<target ref="id53"/>
 			<label kind="assignment" x="-1360" y="-1122">target_id = readMessageSingle(civilian_id)</label>
 		</transition>
-		<transition id="id58">
-			<source ref="id42"/>
-			<target ref="id47"/>
+		<transition id="id60">
+			<source ref="id44"/>
+			<target ref="id49"/>
 			<label kind="synchronisation" x="-986" y="-926">drone_msg_contact_first_responder[civilian_id]?</label>
 			<label kind="assignment" x="-790" y="-909">changeStateTo(IN_CONTACT)</label>
 			<nail x="-578" y="-935"/>
 		</transition>
-		<transition id="id59">
-			<source ref="id48"/>
-			<target ref="id39"/>
+		<transition id="id61">
+			<source ref="id50"/>
+			<target ref="id41"/>
 			<label kind="guard" x="-2363" y="-1470">x &gt;= tzr + getDistanceCC(civilian_id,target_id)</label>
 			<label kind="assignment" x="-2363" y="-1453">changeStateTo(SAFE)</label>
 			<nail x="-2380" y="-1479"/>
 		</transition>
-		<transition id="id60">
-			<source ref="id46"/>
-			<target ref="id48"/>
+		<transition id="id62">
+			<source ref="id48"/>
+			<target ref="id50"/>
 			<label kind="guard" x="-1360" y="-1436">x &lt; tzr + getDistanceCC(civilian_id,target_id)</label>
 			<label kind="synchronisation" x="-1360" y="-1419">casualty_msg[target_id]?</label>
 		</transition>
-		<transition id="id61">
-			<source ref="id46"/>
-			<target ref="id39"/>
+		<transition id="id63">
+			<source ref="id48"/>
+			<target ref="id41"/>
 			<label kind="guard" x="-2363" y="-1368">x &gt;= tzr + getDistanceCC(civilian_id,target_id)</label>
 			<label kind="synchronisation" x="-2364" y="-1351">rescue_completed_msg[target_id]!</label>
 			<label kind="assignment" x="-2363" y="-1334">changeStateTo(SAFE)</label>
 			<nail x="-1368" y="-1377"/>
 			<nail x="-2380" y="-1377"/>
 		</transition>
-		<transition id="id62">
-			<source ref="id42"/>
-			<target ref="id45"/>
+		<transition id="id64">
+			<source ref="id44"/>
+			<target ref="id47"/>
 			<label kind="synchronisation" x="-1360" y="-1003">drone_msg_zero_responder[civilian_id]?</label>
 			<label kind="assignment" x="-1360" y="-986">changeStateTo(ZERO_RESPONDER)</label>
 		</transition>
-		<transition id="id63">
-			<source ref="id44"/>
-			<target ref="id39"/>
+		<transition id="id65">
+			<source ref="id46"/>
+			<target ref="id41"/>
 			<label kind="synchronisation" x="-2346" y="-1139">rescue_completed_msg[civilian_id]?</label>
 			<label kind="assignment" x="-2346" y="-1122">changeStateTo(SAFE)</label>
 		</transition>
-		<transition id="id64">
-			<source ref="id44"/>
-			<target ref="id43"/>
+		<transition id="id66">
+			<source ref="id46"/>
+			<target ref="id45"/>
 			<label kind="guard" x="-2014" y="-1258">x &gt;= tv</label>
 			<label kind="synchronisation" x="-2014" y="-1241">casualty_msg[civilian_id]!</label>
 			<label kind="assignment" x="-2014" y="-1224">changeStateTo(CASUALITY)</label>
 			<nail x="-2023" y="-1266"/>
 		</transition>
-		<transition id="id65">
-			<source ref="id41"/>
-			<target ref="id44"/>
+		<transition id="id67">
+			<source ref="id43"/>
+			<target ref="id46"/>
 			<label kind="synchronisation" x="-1997" y="-1139">rescue_msg[civilian_id]?</label>
 			<label kind="assignment" x="-1997" y="-1122">changeStateTo(IN_ASSISTANCE)</label>
 		</transition>
-		<transition id="id66">
-			<source ref="id41"/>
-			<target ref="id43"/>
+		<transition id="id68">
+			<source ref="id43"/>
+			<target ref="id45"/>
 			<label kind="guard" x="-1700" y="-1215">x &gt;= tv</label>
 			<label kind="assignment" x="-1700" y="-1198">changeStateTo(CASUALITY)</label>
 		</transition>
-		<transition id="id67">
-			<source ref="id40"/>
-			<target ref="id42"/>
+		<transition id="id69">
+			<source ref="id42"/>
+			<target ref="id44"/>
 			<label kind="guard" x="-1683" y="-960">!amVictim()</label>
 		</transition>
-		<transition id="id68">
-			<source ref="id40"/>
-			<target ref="id41"/>
+		<transition id="id70">
+			<source ref="id42"/>
+			<target ref="id43"/>
 			<label kind="guard" x="-1708" y="-1037">amVictim()</label>
 			<label kind="assignment" x="-1708" y="-1020">changeStateTo(VICTIM), x = 0</label>
 		</transition>
-		<transition id="id69">
-			<source ref="id38"/>
-			<target ref="id40"/>
+		<transition id="id71">
+			<source ref="id40"/>
+			<target ref="id42"/>
 			<label kind="guard" x="-2346" y="-960">!amSafe()</label>
 		</transition>
-		<transition id="id70">
-			<source ref="id38"/>
-			<target ref="id39"/>
+		<transition id="id72">
+			<source ref="id40"/>
+			<target ref="id41"/>
 			<label kind="guard" x="-2371" y="-1037">amSafe()</label>
 			<label kind="assignment" x="-2371" y="-1020">changeStateTo(SAFE)</label>
 		</transition>
-		<transition id="id71">
-			<source ref="id37"/>
-			<target ref="id38"/>
-			<label kind="synchronisation" x="-2771" y="-960">initialization_completed?</label>
-			<label kind="assignment" x="-2771" y="-926">updateMap(CIVILIAN, c_position[civilian_id])</label>
+		<transition id="id73">
+			<source ref="id39"/>
+			<target ref="id40"/>
+			<label kind="synchronisation" x="-2771" y="-986">initialization_completed?</label>
+			<label kind="assignment" x="-2771" y="-969">updateMap(CIVILIAN,c_position[civilian_id])</label>
 		</transition>
 	</template>
 	<system>// Template instantiations
