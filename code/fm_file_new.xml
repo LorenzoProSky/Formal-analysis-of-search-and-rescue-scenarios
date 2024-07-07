@@ -141,9 +141,9 @@ position getNewPosition(int direction, position old_position){
     int new_c = old_position.c;
 
     // Calculate new position based on direction
-    if (direction == UP) new_r++;
+    if (direction == UP) new_r--;
     else if (direction == RIGHT) new_c++;
-    else if (direction == DOWN) new_r--;
+    else if (direction == DOWN) new_r++;
     else if (direction == LEFT) new_c--;
 
     
@@ -308,7 +308,7 @@ void move() {
    
 }
 
-// Look for the survivor, victim and first responder in range and update the local variables.
+// Look for the survivor, victim in range and update the local variables.
 // If more then one civilian, victim or first responder are detected only the closest ones to the Drones are saved.
 void detect() {
     int closest_survivor_distance = drone_nvs[drone_id] + 1; // Initialize with a distance greater than Nv
@@ -316,24 +316,24 @@ void detect() {
     position current_position = d_position[drone_id];
     int row, col, distance, i;
     int nv = drone_nvs[drone_id];
-    
-    // Scan the entire grid, but only consider cells within Nv distance
-    for (row = 0; row &lt; N_ROW; row++) {
-        for (col = 0; col &lt; N_COL; col++) {
-            position cell_position = {row, col};
-            distance = getDistance(current_position, cell_position);
-            
-            // Only process cells within drone_Nv distance
-            if (distance &lt;= nv) {
+    position cell_position;
+
+    // Check all cells in a square with side length 2*nv+1 centered on the drone
+    for (row = current_position.r - nv; row &lt;= current_position.r + nv; row++) {
+        for (col = current_position.c - nv; col &lt;= current_position.c + nv; col++) {
+            // Check if the cell is within grid boundaries
+            if (row &gt;= 0 &amp;&amp; row &lt; N_ROW &amp;&amp; col &gt;= 0 &amp;&amp; col &lt; N_COL) {
+                cell_position.r = row;
+                cell_position.c = col;
+                distance = getDistance(current_position, cell_position);
                 // Check for survivors (CIVILIAN)
                 if (map[row][col] == CIVILIAN) {
-                    for (i = 0; i &lt; N_FIRST_RESPONDER; i++) {
+                    for (i = 0; i &lt; N_CIVILIAN; i++) {
                         if (c_position[i].r == row &amp;&amp; c_position[i].c == col) {
                             if (distance &lt; closest_survivor_distance) {
                                 detected_survivor_id = i;
                                 closest_survivor_distance = distance;
                             }
-                            //break;
                         }
                     } 
                 }
@@ -345,7 +345,6 @@ void detect() {
                                 detected_victim_id = i;
                                 closest_victim_distance = distance;
                             }
-                            //break;
                         }
                     }
                 }
@@ -528,6 +527,8 @@ void readMessageFromContactingCivilian() {
 		</location>
 		<location id="id25" x="-1020" y="-1462">
 			<name x="-1003" y="-1487">Wandering</name>
+			<label kind="comments" x="-918" y="-1487">We decided that if the first responder cannot move then
+it cannot detect other civilians.</label>
 		</location>
 		<init ref="id17"/>
 		<transition id="id26">
