@@ -525,12 +525,16 @@ void initializeGlobalCommunication()  {
 clock global_time;
 
 // Property 1 and 2
-int t_scs = 100;
-int n_safe_minimum = N_CIVILIAN; // number of civilians maximum that can be saved
-int n_safe_always = 1; // minimum number of civilians that are always saved
-int n_safe = 0; // Number of safe civilians
+int n_safe; // Number of safe civilians
 int n_casualty = 0; // Number of casualties
 
+int t_scs = 100;
+int percentage = 100; // N% written as a whole (e.g. 10 = 10%)
+int n_percentage; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
+
+void initializeQueries(){
+     n_percentage = (N_CIVILIAN * percentage * 10 + 500) / 1000; 
+}
 
 // Checks if the positions of the civialins are different
 bool areDifferent(){
@@ -550,11 +554,14 @@ bool areDifferent(){
 		<declaration>void initialization() {
     initializePositions();
     initializeGlobalCommunication();
+    initializeQueries();
 }</declaration>
 		<location id="id0" x="-561" y="-68">
+			<name x="-603" y="-102">Start</name>
 			<committed/>
 		</location>
 		<location id="id1" x="-272" y="-68">
+			<name x="-282" y="-102">Initialized</name>
 		</location>
 		<init ref="id0"/>
 		<transition id="id2">
@@ -1251,19 +1258,24 @@ system initializer, drone0, drone1, fr0, fr1, civ0, civ1, civ2, civ3;
 			<comment>Checks that the system never incounters a deadlock. Since our simulation goes on forever even when all the civilians are safe or dead it should go on forever.</comment>
 		</query>
 		<query>
-			<formula>E&lt;&gt; (global_time &lt; t_scs &amp;&amp; n_safe &gt;= n_safe_minimum)</formula>
+			<formula>E&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; initializer.Initialized &amp;&amp; global_time &lt; t_scs</formula>
 			<comment>Checks that there exists at least one scenario where the minimum number of civilians can be saved within the time limit. </comment>
 		</query>
 		<query>
-			<formula>A[] (global_time &gt;= t_scs imply n_safe &gt;= n_safe_always)</formula>
-			<comment>Checks if the number of safe civilians (n_safe) is greater than 1 after the time t_scs (time since critical state) has passed. </comment>
-			<result outcome="failure" type="quality" timestamp="2024-07-09 16:54:44 +0200">
+			<formula>A[] (initializer.Initialized &amp;&amp; global_time &gt; t_scs) imply (n_safe &gt;= n_percentage)</formula>
+			<comment>Checks if the number of safe civilians (n_safe) is greater than n_percentage before time t_scs (time since critical state) has passed. 
+
+"if we are in the Initialized state and the global time is greater then t_scs then the number of safe people must be greater then n_percentage".</comment>
+			<result outcome="failure" type="quality" timestamp="2024-07-10 15:13:46 +0200">
 				<option key="--diagnostic" value="1"/>
 			</result>
 		</query>
 		<query>
 			<formula>A[] areDifferent()</formula>
 			<comment/>
+			<result outcome="failure" type="quality" timestamp="2024-07-10 12:31:24 +0200">
+				<option key="--diagnostic" value="1"/>
+			</result>
 		</query>
 	</queries>
 </nta>
