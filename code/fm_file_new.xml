@@ -305,6 +305,12 @@ bool isInsideMap(int row, int col) {
     return row &gt;= 0 &amp;&amp; row &lt; N_ROW &amp;&amp; col &gt;= 0 &amp;&amp; col &lt; N_COL;
 }
 
+bool isPositionFree(int row, int col){
+    if(map[row][col] == FREE)
+        return true;
+    return false;
+}
+
 // Checks if the cell in the provided direction from the current_position is free and within bounds
 bool canMove(int direction, position current_position) {
     int new_r;
@@ -324,6 +330,10 @@ bool canMove(int direction, position current_position) {
 
     // Check if new position is within grid bounds and empty
     if (!isInsideMap(new_r, new_c) || map[new_r][new_c] != 0) 
+        return false;
+    
+    // Check if the map is free in the new cell
+    if(!isPositionFree(new_r, new_c))
         return false;
 
     return true;
@@ -389,29 +399,36 @@ int getDistance(position pos1, position pos2) {
     return (dr &gt; 0 ? dr : -dr) + (dc &gt; 0 ? dc : -dc);
 }
 
-// Gets distance between 2 civialians indipendent of their states
+// Gets distance between 2 civilians indipendent of their states
 int getDistanceCC(int c1_id, int c2_id) {
     position position_c1 = c_position[c1_id];
     position position_c2 = c_position[c2_id];
     return getDistance(position_c1, position_c2);
 }
 
-// Gets distance between a civialian and a first responder indipendent of their states
+// Gets distance between a civilian and a first responder indipendent of their states
 int getDistanceCF(int c_id, int fr_id) {
     position position_c = c_position[c_id];
     position position_fr = f_position[fr_id];
     return getDistance(position_c, position_fr);
 }
 
-// Change state of entity
+// Change state of entity on the map
 void changeStateTo(int entity_id, int entity_type, int new_state) {
     position current_position;
-    if (entity_type == CIVILIAN)
+    if (entity_type == CIVILIAN){
         current_position = c_position[entity_id];
-    else if(entity_type == FIRST_RESPONDER)
+    }else if(entity_type == FIRST_RESPONDER) {
         current_position = f_position[entity_id];
+    }
 
     updateMap(new_state, current_position);
+
+    // if the civialian is dead or safe we also remove it from the c_position array
+    if(entity_type == CIVILIAN &amp;&amp; new_state == 0) {
+        position temp = {-1, -1};
+        c_position[entity_id] = temp;
+    }
 }
 
 // Find civilian id from its position
@@ -528,26 +545,53 @@ clock global_time;
 int n_safe; // Number of safe civilians
 int n_casualty = 0; // Number of casualties
 
-int t_scs = 100;
-int percentage = 100; // N% written as a whole (e.g. 10 = 10%)
+int t_scs = 10;
+int percentage = 200; // N% written as a whole (e.g. 10 = 10%)
 int n_percentage; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
 
 void initializeQueries(){
      n_percentage = (N_CIVILIAN * percentage * 10 + 500) / 1000; 
 }
 
-// Checks if the positions of the civialins are different
+// Checks if the positions of the civilians are different
 bool areDifferent(){
-  position p;
-  for (i : int[0,N_CIVILIAN-1]) {
-    p = c_position[i];
-    for (j : int[0,N_CIVILIAN-1]) {
-        if (p.r == c_position[j].r &amp;&amp; p.c == c_position[j].c &amp;&amp; i != j &amp;&amp; p.r != 0 &amp;&amp; p.c != 0) {
-            return false;
+    int i,j;
+    // Check civilian positions
+    for (i = 0; i &lt; N_CIVILIAN - 1; i++) {
+        if (c_position[i].r != -1 || c_position[i].c != -1) {
+            for (j = i + 1; j &lt; N_CIVILIAN; j++) {
+                if ((c_position[j].r != -1 || c_position[j].c != -1) &amp;&amp;
+                    c_position[i].r == c_position[j].r &amp;&amp; 
+                    c_position[i].c == c_position[j].c) {
+                    return false;
+                }
+            }
         }
     }
-  }
-  return true;
+
+    // Check first responder positions
+    for (i = 0; i &lt; N_FIRST_RESPONDER - 1; i++) {
+        for (j = i + 1; j &lt; N_FIRST_RESPONDER; j++) {
+            if (f_position[i].r == f_position[j].r &amp;&amp; 
+                f_position[i].c == f_position[j].c) {
+                return false;
+            }
+        }
+    }
+
+    // Check if any non-(-1, -1) civilian position matches any first responder position
+    for (i = 0; i &lt; N_CIVILIAN; i++) {
+        if (c_position[i].r != -1 || c_position[i].c != -1) {
+            for (j = 0; j &lt; N_FIRST_RESPONDER; j++) {
+                if (c_position[i].r == f_position[j].r &amp;&amp; 
+                    c_position[i].c == f_position[j].c) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }</declaration>
 	<template>
 		<name>Initializer</name>
@@ -954,6 +998,7 @@ bool amVictim() {
 }
 
 void changeStateCivilian(int new_state) {
+
     if (new_state == SAFE) {
         n_safe++;
         new_state = 0;
@@ -961,6 +1006,7 @@ void changeStateCivilian(int new_state) {
         n_casualty++;
         new_state = 0;
     }
+
     changeStateTo(civilian_id, CIVILIAN, new_state);
 }
 
@@ -973,6 +1019,7 @@ void readDoubleMessageFromDrone() {
 
 bool isCommVictimStillVictim() {
     position target_position = c_position[comm_victim_id];
+    if(target_position.c == -1 &amp;&amp; target_position.r == -1) return false;
     return map[target_position.r][target_position.c] == VICTIM;
 }
 
@@ -1254,28 +1301,23 @@ system initializer, drone0, drone1, fr0, fr1, civ0, civ1, civ2, civ3;
 	<queries>
 		<option key="--diagnostic" value="1"/>
 		<query>
-			<formula>A[] (global_time &lt; 100) imply (not deadlock)</formula>
-			<comment>Checks that the system never incounters a deadlock. Since our simulation goes on forever even when all the civilians are safe or dead it should go on forever.</comment>
-		</query>
-		<query>
-			<formula>E&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; initializer.Initialized &amp;&amp; global_time &lt; t_scs</formula>
-			<comment>Checks that there exists at least one scenario where the minimum number of civilians can be saved within the time limit. </comment>
-		</query>
-		<query>
-			<formula>A[] (initializer.Initialized &amp;&amp; global_time &gt; t_scs) imply (n_safe &gt;= n_percentage)</formula>
-			<comment>Checks if the number of safe civilians (n_safe) is greater than n_percentage before time t_scs (time since critical state) has passed. 
+			<formula>E&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized </formula>
+			<comment>Checks that it is possible for a percentage N% of all civilians to reach a safe state within time Tscs.
 
-"if we are in the Initialized state and the global time is greater then t_scs then the number of safe people must be greater then n_percentage".</comment>
-			<result outcome="failure" type="quality" timestamp="2024-07-10 15:13:46 +0200">
+i.e. checks for a upper bound.</comment>
+		</query>
+		<query>
+			<formula>A&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
+			<comment>Checks that a percentage N% of all civilians is always guaranteed to reach a safe state within time Tscs.
+
+i.e. checks for a lower bound.</comment>
+			<result outcome="failure" type="quality" timestamp="2024-07-18 22:26:04 +0200">
 				<option key="--diagnostic" value="1"/>
 			</result>
 		</query>
 		<query>
-			<formula>A[] areDifferent()</formula>
-			<comment/>
-			<result outcome="failure" type="quality" timestamp="2024-07-10 12:31:24 +0200">
-				<option key="--diagnostic" value="1"/>
-			</result>
+			<formula>A[] (initializer.Start &amp;&amp; !areDifferent()) || (initializer.Initialized &amp;&amp; areDifferent())</formula>
+			<comment>Checks that the positions of the civilians and first responders are always unique.</comment>
 		</query>
 	</queries>
 </nta>

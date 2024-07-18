@@ -2,10 +2,11 @@
 <!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
 <nta>
 	<declaration>// Place global declarations here.
-const int GRID_SIZE = 3;
+const int GRID_SIZE = 10;
 const int N_PERSONS = 3;
 
-int grid[GRID_SIZE][GRID_SIZE] = {{1,0,0},{0,1,0},{0,0,1}};
+int grid[GRID_SIZE][GRID_SIZE] = {{1,0,0,0,0,0,0,0,0,0},{0,1,0,0,0,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0,0}};
+// int grid[GRID_SIZE][GRID_SIZE] = {{1,0,0},{0,1,0},{0,0,1}}
 
 typedef struct {
     int r;
@@ -59,7 +60,9 @@ bool are_different(){
   }
   return true;
 
-}</declaration>
+}
+
+clock global_time;</declaration>
 	<template>
 		<name x="5" y="5">Civilian</name>
 		<parameter>int person_id</parameter>
@@ -186,11 +189,8 @@ system P1, P2, P3, I;
 			</result>
 		</query>
 		<query>
-			<formula>A[] are_different()</formula>
+			<formula>A[] are_different() &amp;&amp; global_time &lt;= 1</formula>
 			<comment/>
-			<result outcome="success" type="quality" timestamp="2024-06-27 10:25:07 +0200">
-				<option key="--diagnostic" value="2"/>
-			</result>
 		</query>
 		<query>
 			<formula>A[] not deadlock</formula>
