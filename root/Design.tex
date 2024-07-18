@@ -1,16 +1,94 @@
 
 \section{Model Description}
+From here after the word \textit{entity} refers to civilians, first-responders or drones (and all of their subcategories), while \textit{object} refers to fire and exit. Each entity is uniquely identified among other entities of the same type by an id. While going through the different aspects and sections of the model, the corresponding design decisions will also be directly highlighted and explained.
+
 
 \subsection{Layout}
+\paragraph{Map and Positions}
+\label{sec:map}
+The modelling of the emergency area is achieved by a 2D array, called for simplicity map. In addition, the position of each entity is specified in its respective 1D array, where the particular entity is identified by its index and each element of the array is a pair of coordinates (referring to the map).\newline
+Each map cell contains only one value and each cell type value has a different meaning. The most meaningful and critical decisions to explain are two. The first one is the absence of a drone-value in the map, deemed superfluous and a complicating factor due to the following considerations: drones can fly over other entities and objects, and the drone moving policy adopted (explained in section~\ref{sec:drone}). The second point is the values of \textit{SAFE} and \textit{CASUALTY}, which are different in principle (to distinguish the two states inside model logic), but then are written in the map as the same, \textit{FREE}. This last choice was done because when civilians are saved or die, they are no longer part of the scenario and the cell that they once occupied is now free.
+\paragraph{General Movement and Detection}
+Entities can move following their respective moving policy inside the map. The following \textit{simplifying assumption} was made: entities can only move in the four cardinal directions. From this point stems the fact that distances between cells is calculated via the Manhattan distance. This choice was made to simplify the moving policy without loss of generality, since the model can be extended to work with movement in all eight directions without impacting the overall model and logic. On the other hand, entities can detect other entities and objects in all directions. This choice was made to simulate the idealistic behaviour of entities, which could not be simplified like for the moving policy. This decision places greater emphasis on the detection policies rather than on the moving policies.
 
-\subsection{Civilian}
 
-\subsubsection{Stochastic Version}
+\subsection{Communication}
+As it will be clearly explained in future sections, entities need to communicate in a particular and specific fashion.
+\paragraph{Channels}
+A given entity need to synchronize with a specific entity over a channel, to achieve this binary correspondence channel arrays were utilized, where the specific target entity for that channel is identified by its id. Each channel is clearly named after the communication that it represents.
+\paragraph{Message Passing}
+In addition to synchronization, entities also need to pass information between each other and to solve this problem a communication mechanism was implemented. At the core of the system there are messages (single or double, depending on the number of values contained), then each entity will have its own inbox containing a single message and at the end all of them are grouped into a single array of inboxes, contained in a global structure (communication purpose specific). The model simulates a postman carring letters to different recipients, managing all of the message passing and cleaning the inboxes whenever necessary.
 
-\subsection{First-Responder}
 
-\subsection{Drone}
+\subsection{Templates}
+The model is based on the following 4 templates:
+\begin{itemize}
+	\item \textit{Initializer}: helping template to initialize the scene and the various used data structures.
+	\item \textit{Civilian}: person in need of rescue inside the emergency area, who can be saved or die and who can receive instructions by a drone.
+	\item \textit{First-Responder}: trained professional rescuing civilians inside the emergency area.
+	\item \textit{Drone}: autonomous flying entity, which has the objective of instructing civilians in the best way possible to maximizing rescue rate.
+\end{itemize}
 
-\subsubsection{Stochastic Version}
 
-\subsection{Design Choices}
+\subsubsection{Initializer}
+Simple automaton to correctly populate the map with entities and to initialize all the global data structures. Following this initialization all the other automata are signaled to start.
+
+
+\subsubsection{Civilian}
+A civilian can be:
+\begin{itemize}
+	\item \textit{CIVILIAN}: default civilian, also referred to as survivor.
+	\item \textit{SAFE}: saved civilian.
+	\item \textit{VICTIM}: civilian near a fire.
+	\item \textit{CASUALTY}: civilian no longer alive.
+	\item \textit{IN\_ASSISTANCE}: victim who is being assisted by a responder.
+	\item \textit{ZERO\_RESPONDER}: civilian who was instructed by a drone to help a victim.
+	\item \textit{IN\_CONTACT}: civilian who was instructed by a drone to contact a first-responder.
+\end{itemize}
+
+\noindent
+All these different subcategories were used to explicitly model the different conceptual states in which a civilian can be in and their evolution during a scenario. In addition, this clear distinction enables the model to utilize more precise, easier and cleaner logics and to avoid many problems related to miss-communication or multi-communication.\newline
+
+\noindent
+A civilian is characterized by the following features:
+\begin{itemize}
+	\item \textit{civilian\_id}
+	\item \textit{tv}: time in seconds before a victim becomes a casualty.
+	\item \textit{tzr}: time in seconds before a zero-responder finishes rescuing a victim.
+\end{itemize}
+
+\paragraph{Behaviour}
+What follows is the general behaviour and the most important aspects of the civilian template, not all transactions and details will be discussed.\newline
+A civilian can check its surroundings up to 1-cell distance.
+
+\begin{enumerate}
+	\item A civilian starts off by going through two initial committed states in which it is checked if it is \textit{safe} or \textit{victim}, if neither of those are true it ends up in an \textit{Idle} state. The committed nature of these first two states is fundamental, since no other entity can move apart for civilians (can interlive their actions) and this assures that the model behaves as intended. Because at each step of a civilian, before any other entity can do anything, that civilian will correctly update its state, not missleading any other entity by being in a wrong state. In addition, this also works perfectly for the initialization phase of the civilians in the map.
+	
+	\item When a civilian becomes a \textit{victim}, it will become a \textit{casualty} after \textit{tv} time. However, if in this period of time it is assisted by a responder, it can be saved. If the civilian is \textit{in assistance} and becomes a \textit{casualty} this event will be synchronized with the responder.\newline
+	What happens when a civilian becomes \textit{safe} or \textit{casualty} inside the map has been already described in section~\ref{sec:map}.
+	
+	\item From the \textit{Idle} state, a \textit{civilian} can be contacted by a drone or it can move randomly (civilian moving policy).
+	
+	\item When it is contacted by a drone, it can be instructed to become a \textit{zero-responder} or an \textit{in contact} civilian. The committed states are fundamental to create atomic transactions, while the non-committed ones are needed to let time pass.
+	
+	\begin{enumerate}
+		\item In the \textit{zero-responder} case, the civilian will read the message sent by the drone to know which \textit{victim} to assist. After that it will perform the rescue as a responder. If the \textit{victim} becomes a \textit{casualty} before the end of the rescue, the \textit{zero-responder} will still end its own rescue.
+		
+		\item In the \textit{in contact} case, the civilian will read the message sent by the drone to know which \textit{first-responder} to contact and which \textit{victim} is in need of assistance. Firstly, the civilian enacts the moving towards the \textit{first-responder} to contact it. When it arrives, it waits for the \textit{first-responder} to be free and then communicate who needs assistance. After that, it will be saved by the first-responder.\newline
+		It might happen that while the civilian is reaching the first-responder or is waiting for the first-responder to be free, the \textit{victim} is no longer in need of assistance (be it already saved, a casualty or in assistance) and in this case the civilian will not contact the first-responder. This choice was made not to waste the precious time of the first-responder. In addition, it is based on the decision policy of the drone (described in section~\ref{sec:drone}). Finally, the first-responder does not assist the contacting survivor even if it is waiting (near the first-responder), because the contacting survivor is not in need of assistance and the rescue has not yet started. So the first-responder should prioritize rescuing other victims, while (in a real scenario) just instructing the contacting survivor to go to the nearest exit.
+	\end{enumerate}
+\end{enumerate}
+
+
+\paragraph{Stochastic Version}
+TODO
+
+\subsubsection{First-Responder}
+
+
+\subsubsection{Drone}
+\label{sec:drone}
+
+\paragraph{Stochastic Version}
+TODO
+
