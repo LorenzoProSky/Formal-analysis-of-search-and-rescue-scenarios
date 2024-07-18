@@ -3,6 +3,76 @@
 
 \subsection{Non-stochastic Scenarios}
 
+In order to comprehensively evaluate the effectiveness and adaptability of our emergency response system, we have designed three distinct scenarios that simulate a range of real-world emergency situations. These scenarios are carefully crafted to test various aspects of the system's performance under different conditions, each presenting unique challenges and constraints.
+The scenarios we have developed are:
+
+Urban High-Rise Fire
+Large-Scale Natural Disaster
+Industrial Complex Emergency
+
+Each scenario is characterized by a specific set of parameters that define the operational environment, available resources, and the nature of the emergency. These parameters include:
+
+Map dimensions
+Number and capabilities of drones
+Number and efficiency of first responders
+Number and vulnerability of civilians
+
+By varying these parameters across scenarios, we aim to assess how our system performs under different conditions, such as:
+
+Dense urban environments vs. widespread disaster areas
+Limited vs. advanced drone capabilities
+Varying levels of civilian vulnerability and self-rescue ability
+
+The following sections will detail each scenario, explaining the rationale behind the chosen parameters and the specific aspects of system performance they are designed to evaluate.
+
+Scenario 1: Urban High-Rise Fire
+This scenario simulates a fire in a multi-story urban building, testing the system's efficiency in a compact, high-stakes environment.
+Parameters:
+
+Map size: 10x8
+Drones: 2 (high visibility: nv = 2)
+First Responders: 2 (moderate rescue time: tfr = 2-3)
+Civilians: 3 (varied vulnerability: tv = 2-11, moderate zero-responder rescue time: tzr = 1-2)
+
+Rationale:
+The compact map size (10x8) represents a dense urban environment, typical of a high-rise building floor plan. This layout challenges the system to navigate tight spaces and make quick decisions.
+Two drones with high visibility (nv = 2) simulate advanced thermal imaging capabilities, crucial for locating civilians through smoke and obstacles in a building fire. Their effectiveness in this enclosed space is key to rapid response.
+The moderate number of first responders (2) with varied rescue times (tfr = 2-3) reflects the reality of initial emergency teams entering a burning building. Their slightly different rescue times account for varying levels of experience or equipment.
+Three civilians with diverse vulnerabilities (tv = 2-11) represent a mix of building occupants, from those in immediate danger to those with more time to be rescued. The moderate zero-responder rescue times (tzr = 1-2) indicate that some civilians might attempt self-rescue or assist others, typical in a fire scenario where immediate evacuation is crucial.
+This scenario tests the system's ability to prioritize rescues in a time-sensitive, spatially constrained environment where every decision is critical.
+
+Scenario 2: Large-Scale Natural Disaster
+This scenario simulates a widespread natural disaster, such as a flood or earthquake, testing the system's ability to handle a complex, large-scale situation with advanced but limited drone resources.
+Parameters:
+
+Map size: 20x15
+Drones: 2 (high visibility: nv = 3)
+First Responders: 5 (high rescue time: tfr = 8)
+Civilians: 10 (high vulnerability: tv = 15-25, high zero-responder rescue time: tzr = 6)
+
+Rationale:
+The expansive map size (20x15) represents a large affected area, typical of a natural disaster zone. This vast space challenges the system to efficiently allocate resources across a wide area.
+Two drones with high visibility (nv = 3) simulate the deployment of advanced, long-range reconnaissance drones equipped with sophisticated sensors and imaging technology. This high visibility allows for more effective area coverage despite the reduced number of drones, testing the system's ability to maximize the utility of limited but highly capable aerial assets. The scenario explores how well the system can leverage superior information gathering to compensate for fewer aerial units.
+The increased number of first responders (5) with uniformly high rescue times (tfr = 8) reflects the difficulties of navigating a disaster-stricken area. The consistent high rescue time represents the challenges posed by debris, damaged infrastructure, or flood waters that hinder rapid movement.
+Ten civilians with high vulnerabilities (tv = 15-25) and uniformly high zero-responder rescue times (tzr = 6) simulate a population caught unprepared by a sudden, widespread disaster. The high vulnerability scores indicate immediate danger from environmental hazards, while the high zero-responder times suggest that self-rescue or civilian-to-civilian assistance is difficult due to the scale and nature of the disaster.
+This scenario evaluates the system's capacity to manage multiple rescue operations simultaneously across a large area, prioritizing limited resources effectively in a situation where time is critical. It specifically tests how well the system can utilize high-quality information from advanced drones to guide a relatively small number of first responders efficiently. The challenge lies in balancing the comprehensive situational awareness provided by the drones with the limited physical rescue capabilities on the ground, forcing the system to make strategic decisions about resource allocation and rescue prioritization.
+
+Scenario 3: Industrial Complex Emergency
+This scenario simulates an emergency in a medium-sized industrial complex, balancing the challenges of a hazardous environment with moderate resource availability.
+Parameters:
+
+Map size: 18x12
+Drones: 3 (low visibility: nv = 1)
+First Responders: 5 (high rescue time: tfr = 8)
+Civilians: 10 (varied vulnerability: tv = 15-25, high zero-responder rescue time: tzr = 6)
+
+Rationale:
+The medium map size (18x12) represents an industrial complex with multiple buildings and open areas. This layout challenges the system to navigate both enclosed spaces and exposed regions, simulating the varied terrain of an industrial site.
+Three drones with low visibility (nv = 1) reflect the challenges of operating in an environment with potential chemical hazards, smoke, or electromagnetic interference from industrial equipment. This tests the system's ability to make decisions with limited aerial reconnaissance.
+Five first responders with uniformly high rescue times (tfr = 8) simulate the challenges of operating in a hazardous industrial environment. The high rescue time accounts for the need to use specialized equipment, navigate complex industrial structures, and potentially deal with hazardous materials.
+Ten civilians with varied vulnerabilities (tv = 15-25) represent a mix of workers in different parts of the complex, from those in immediate danger near the epicenter of the emergency to those in less affected areas. The uniformly high zero-responder rescue times (tzr = 6) indicate that self-rescue or peer assistance is difficult due to the hazardous nature of the industrial emergency, requiring professional intervention in most cases.
+This scenario evaluates the system's ability to manage rescue operations in a complex, hazardous environment where both the layout and the nature of the emergency pose significant challenges to traditional rescue methods. It tests the balance between resource allocation, risk assessment, and the need for specialized rescue techniques in an industrial setting.
+
 \subsection{Stochastic Scenarios}
 
 \subsection{Verification Results}
