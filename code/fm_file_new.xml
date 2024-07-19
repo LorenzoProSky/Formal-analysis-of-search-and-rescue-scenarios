@@ -51,17 +51,15 @@ position f_position[N_FIRST_RESPONDER]; // First responders positions
 // Map initialization of the FIRE and EXITS
 // Top left cell is at position (0,0) and the bottom right is at (N_ROW - 1, N_COL - 1)
 int map[N_ROW][N_COL] = {
-        {0,0,0,0,0,0,0,0},
-        {0,4,4,0,0,0,0,0},
-        {0,4,4,0,0,0,0,0},
-        {0,0,4,4,0,0,0,0},
-        {0,0,0,0,0,0,0,0}, 
-        {0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,1,1}
- };
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,4,4,0,0,0,0,0,0,0},
+        {0,4,4,0,0,0,0,0,0,0},
+        {0,0,4,4,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0}, 
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,1,1,0,0}
+ }; // 8x10
 
 // Initialize the entities positions
 void initializePositions() {
@@ -80,17 +78,17 @@ void initializePositions() {
 
     // Initialize drone positions
     d0.r = 0;
-    d0.c = 2;
+    d0.c = 4;
     d1.r = 0;
-    d1.c = 5;
+    d1.c = 7;
     d_position[0] = d0;
     d_position[1] = d1;
 
     // Initialize civilian positions
     c0.r = 2;
     c0.c = 3;
-    c1.r = 2;
-    c1.c = 5;
+    c1.r = 7;
+    c1.c = 6;
     c2.r = 3;
     c2.c = 4;
     c_position[0] = c0;
@@ -112,12 +110,12 @@ void initializePositions() {
 // &lt;---- SYSTEM 2 ----&gt;
 const int N_ROW = 20;
 const int N_COL = 15;
-const int N_DRONE = 3;
+const int N_DRONE = 2;
 const int N_FIRST_RESPONDER = 5;
 const int N_CIVILIAN = 10;
 
 const int drone_ids[N_DRONE] = {0,1,2};
-const int drone_nvs[N_DRONE] = {1,1,1};
+const int drone_nvs[N_DRONE] = {3,3};
 
 const int civilian_ids[N_CIVILIAN] = {0,1,2,3,4,5,6,7,8,9};
 const int civilian_tvs[N_CIVILIAN] = {15,18,20,22,25,17,19,21,23,24};
@@ -133,41 +131,40 @@ position f_position[N_FIRST_RESPONDER]; // First responders positions
 
 // Map initialization of the FIRE and EXITS
 int map[N_ROW][N_COL] = {
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 0},
-    {0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 0},
-    {0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}
-};
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4},
+    {0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4},
+    {0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}
+}; // 20x14
 
 // Initialize the entities positions
 void initializePositions() {
     // Drones
-    position d0, d1, d2;
+    position d0, d1;
     // Civilians
     position c0, c1, c2, c3, c4, c5, c6, c7, c8, c9;
     // First responders
     position f0, f1, f2, f3, f4;
 
     // Initialize drone positions
-    d0.r = 0; d0.c = 0;
-    d1.r = 0; d1.c = 7;
-    d2.r = 0; d2.c = 14;
+    d0.r = 0; d0.c = 3;
+    d1.r = 0; d1.c = 10;
     d_position[0] = d0;
     d_position[1] = d1;
     d_position[2] = d2;
@@ -196,7 +193,7 @@ void initializePositions() {
 
     // Initialize first responders positions
     f0.r = 18; f0.c = 0;
-    f1.r = 18; f1.c = 14;
+    f1.r = 18; f1.c = 13;
     f2.r = 19; f2.c = 3;
     f3.r = 19; f3.c = 7;
     f4.r = 19; f4.c = 11;
@@ -214,12 +211,12 @@ void initializePositions() {
 // &lt;---- SYSTEM 3 ----&gt;
 const int N_ROW = 18;
 const int N_COL = 12;
-const int N_DRONE = 3;
+const int N_DRONE = 4;
 const int N_FIRST_RESPONDER = 5;
 const int N_CIVILIAN = 10;
 
-const int drone_ids[N_DRONE] = {0,1,2};
-const int drone_nvs[N_DRONE] = {1,1,1};
+const int drone_ids[N_DRONE] = {0,1,2,3};
+const int drone_nvs[N_DRONE] = {1,1,1,1};
 
 const int civilian_ids[N_CIVILIAN] = {0,1,2,3,4,5,6,7,8,9};
 const int civilian_tvs[N_CIVILIAN] = {15,18,20,22,25,17,19,21,23,24};
@@ -253,24 +250,26 @@ int map[N_ROW][N_COL] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}
-};
+}; //18x12
 
 // Initialize the entities positions
 void initializePositions() {
     // Drones
-    position d0, d1, d2;
+    position d0, d1, d2, d3;
     // Civilians
     position c0, c1, c2, c3;
     // First responders
     position f0, f1;
 
     // Initialize drone positions
-    d0.r = 0; d0.c = 0;
-    d1.r = 0; d1.c = 5;
-    d2.r = 0; d2.c = 11;
+    d0.r = 0; d0.c = 1;
+    d1.r = 0; d1.c = 4;
+    d2.r = 0; d2.c = 7;
+    d2.r = 0; d2.c = 10;
     d_position[0] = d0;
     d_position[1] = d1;
     d_position[2] = d2;
+    d_position[3] = d3;
 
     // Initialize civilian positions
     c0.r = 5; c0.c = 3;
@@ -543,10 +542,14 @@ clock global_time;
 
 // Property 1 and 2
 int n_safe; // Number of safe civilians
-int n_casualty = 0; // Number of casualties
+int n_casualty; // Number of casualties
 
-int t_scs = 10;
-int percentage = 200; // N% written as a whole (e.g. 10 = 10%)
+int t_scs = 0;
+
+int percentage = 25; // N% written as a whole (e.g. 10 = 10%)
+//int percentage = 50; // N% written as a whole (e.g. 10 = 10%)
+//int percentage = 75; // N% written as a whole (e.g. 10 = 10%)
+//int percentage = 100; // N% written as a whole (e.g. 10 = 10%)
 int n_percentage; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
 
 void initializeQueries(){
@@ -1305,13 +1308,16 @@ system initializer, drone0, drone1, fr0, fr1, civ0, civ1, civ2, civ3;
 			<comment>Checks that it is possible for a percentage N% of all civilians to reach a safe state within time Tscs.
 
 i.e. checks for a upper bound.</comment>
+			<result outcome="success" type="quality" timestamp="2024-07-19 17:04:17 +0200">
+				<option key="--diagnostic" value="1"/>
+			</result>
 		</query>
 		<query>
 			<formula>A&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
 			<comment>Checks that a percentage N% of all civilians is always guaranteed to reach a safe state within time Tscs.
 
 i.e. checks for a lower bound.</comment>
-			<result outcome="failure" type="quality" timestamp="2024-07-18 22:26:04 +0200">
+			<result outcome="failure" type="quality" timestamp="2024-07-19 16:40:40 +0200">
 				<option key="--diagnostic" value="1"/>
 			</result>
 		</query>

@@ -29,13 +29,13 @@ Scenario 1: Urban High-Rise Fire
 This scenario simulates a fire in a multi-story urban building, testing the system's efficiency in a compact, high-stakes environment.
 Parameters:
 
-Map size: 10x8
+Map size: 8x10
 Drones: 2 (high visibility: nv = 2)
 First Responders: 2 (moderate rescue time: tfr = 2-3)
 Civilians: 3 (varied vulnerability: tv = 2-11, moderate zero-responder rescue time: tzr = 1-2)
 
 Rationale:
-The compact map size (10x8) represents a dense urban environment, typical of a high-rise building floor plan. This layout challenges the system to navigate tight spaces and make quick decisions.
+The compact map size (8x10) represents a dense urban environment, typical of a high-rise building floor plan. This layout challenges the system to navigate tight spaces and make quick decisions.
 Two drones with high visibility (nv = 2) simulate advanced thermal imaging capabilities, crucial for locating civilians through smoke and obstacles in a building fire. Their effectiveness in this enclosed space is key to rapid response.
 The moderate number of first responders (2) with varied rescue times (tfr = 2-3) reflects the reality of initial emergency teams entering a burning building. Their slightly different rescue times account for varying levels of experience or equipment.
 Three civilians with diverse vulnerabilities (tv = 2-11) represent a mix of building occupants, from those in immediate danger to those with more time to be rescued. The moderate zero-responder rescue times (tzr = 1-2) indicate that some civilians might attempt self-rescue or assist others, typical in a fire scenario where immediate evacuation is crucial.
@@ -45,13 +45,13 @@ Scenario 2: Large-Scale Natural Disaster
 This scenario simulates a widespread natural disaster, such as a flood or earthquake, testing the system's ability to handle a complex, large-scale situation with advanced but limited drone resources.
 Parameters:
 
-Map size: 20x15
+Map size: 21x15
 Drones: 2 (high visibility: nv = 3)
 First Responders: 5 (high rescue time: tfr = 8)
 Civilians: 10 (high vulnerability: tv = 15-25, high zero-responder rescue time: tzr = 6)
 
 Rationale:
-The expansive map size (20x15) represents a large affected area, typical of a natural disaster zone. This vast space challenges the system to efficiently allocate resources across a wide area.
+The expansive map size (21x15) represents a large affected area, typical of a natural disaster zone. This vast space challenges the system to efficiently allocate resources across a wide area.
 Two drones with high visibility (nv = 3) simulate the deployment of advanced, long-range reconnaissance drones equipped with sophisticated sensors and imaging technology. This high visibility allows for more effective area coverage despite the reduced number of drones, testing the system's ability to maximize the utility of limited but highly capable aerial assets. The scenario explores how well the system can leverage superior information gathering to compensate for fewer aerial units.
 The increased number of first responders (5) with uniformly high rescue times (tfr = 8) reflects the difficulties of navigating a disaster-stricken area. The consistent high rescue time represents the challenges posed by debris, damaged infrastructure, or flood waters that hinder rapid movement.
 Ten civilians with high vulnerabilities (tv = 15-25) and uniformly high zero-responder rescue times (tzr = 6) simulate a population caught unprepared by a sudden, widespread disaster. The high vulnerability scores indicate immediate danger from environmental hazards, while the high zero-responder times suggest that self-rescue or civilian-to-civilian assistance is difficult due to the scale and nature of the disaster.
@@ -62,7 +62,7 @@ This scenario simulates an emergency in a medium-sized industrial complex, balan
 Parameters:
 
 Map size: 18x12
-Drones: 3 (low visibility: nv = 1)
+Drones: 4 (low visibility: nv = 1)
 First Responders: 5 (high rescue time: tfr = 8)
 Civilians: 10 (varied vulnerability: tv = 15-25, high zero-responder rescue time: tzr = 6)
 
