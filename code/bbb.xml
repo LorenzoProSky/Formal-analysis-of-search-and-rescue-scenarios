@@ -28,6 +28,7 @@ typedef struct {
 
 // ---- SYSTEM DEFINITIONS ----&gt;
 
+/*
 // &lt;---- SYSTEM 1 ----&gt;
 const int N_ROW = 10;
 const int N_COL = 8;
@@ -82,7 +83,7 @@ void initializePositions() {
     d0.r = 0;
     d0.c = 2;
     d1.r = 0;
-    d1.c = 5;
+    d1.c = 7;
     d_position[0] = d0;
     d_position[1] = d1;
 
@@ -106,22 +107,21 @@ void initializePositions() {
     f_position[1] = f1;
 }
 // &lt;---- END SYSTEM 1 ----&gt;
+*/
 
-
-/*
 // &lt;---- SYSTEM 2 ----&gt;
 const int N_ROW = 20;
-const int N_COL = 15;
+const int N_COL = 14;
 const int N_DRONE = 2;
 const int N_FIRST_RESPONDER = 5;
-const int N_CIVILIAN = 10;
+const int N_CIVILIAN = 11;
 
-const int drone_ids[N_DRONE] = {0,1,2};
+const int drone_ids[N_DRONE] = {0,1};
 const int drone_nvs[N_DRONE] = {3,3};
 
-const int civilian_ids[N_CIVILIAN] = {0,1,2,3,4,5,6,7,8,9};
-const int civilian_tvs[N_CIVILIAN] = {15,18,20,22,25,17,19,21,23,24};
-const int civilian_tzrs[N_CIVILIAN] = {6,6,6,6,6,6,6,6,6,6};
+const int civilian_ids[N_CIVILIAN] = {0,1,2,3,4,5,6,7,8,9,10};
+const int civilian_tvs[N_CIVILIAN] = {15,18,20,22,25,17,19,21,23,24,21};
+const int civilian_tzrs[N_CIVILIAN] = {6,6,6,6,6,6,6,6,6,6,6};
 
 const int first_responder_ids[N_FIRST_RESPONDER] = {0,1,2,3,4};
 const int first_responder_tfrs[N_FIRST_RESPONDER] = {8,8,8,8,8};
@@ -160,7 +160,7 @@ void initializePositions() {
     // Drones
     position d0, d1;
     // Civilians
-    position c0, c1, c2, c3, c4, c5, c6, c7, c8, c9;
+    position c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10;
     // First responders
     position f0, f1, f2, f3, f4;
 
@@ -169,10 +169,9 @@ void initializePositions() {
     d1.r = 0; d1.c = 10;
     d_position[0] = d0;
     d_position[1] = d1;
-    d_position[2] = d2;
 
     // Initialize civilian positions
-    c0.r = 5; c0.c = 3;
+    c0.r = 17; c0.c = 3;
     c1.r = 5; c1.c = 11;
     c2.r = 10; c2.c = 7;
     c3.r = 12; c3.c = 2;
@@ -182,6 +181,7 @@ void initializePositions() {
     c7.r = 17; c7.c = 3;
     c8.r = 17; c8.c = 7;
     c9.r = 17; c9.c = 11;
+    c10.r = 19; c10.c = 2;
     c_position[0] = c0;
     c_position[1] = c1;
     c_position[2] = c2;
@@ -192,13 +192,15 @@ void initializePositions() {
     c_position[7] = c7;
     c_position[8] = c8;
     c_position[9] = c9;
+    c_position[10] = c10;
+
 
     // Initialize first responders positions
-    f0.r = 18; f0.c = 0;
-    f1.r = 18; f1.c = 13;
-    f2.r = 19; f2.c = 3;
-    f3.r = 19; f3.c = 7;
-    f4.r = 19; f4.c = 11;
+    f0.r = 0; f0.c = 0;
+    f1.r = 11; f1.c = 13;
+    f2.r = 12; f2.c = 3;
+    f3.r = 12; f3.c = 7;
+    f4.r = 0; f4.c = 0;
     f_position[0] = f0;
     f_position[1] = f1;
     f_position[2] = f2;
@@ -207,7 +209,6 @@ void initializePositions() {
 
 }
 // &lt;---- END SYSTEM 2 ----&gt;
-*/
 
 /*
 // &lt;---- SYSTEM 3 ----&gt;
@@ -267,7 +268,7 @@ void initializePositions() {
     d0.r = 0; d0.c = 1;
     d1.r = 0; d1.c = 4;
     d2.r = 0; d2.c = 7;
-    d2.r = 0; d2.c = 10;
+    d3.r = 0; d3.c = 10;
     d_position[0] = d0;
     d_position[1] = d1;
     d_position[2] = d2;
@@ -577,16 +578,22 @@ int n_safe; // Number of safe civilians
 int n_casualty; // Number of casualties
 int n_missing; // Number of missing civilians
 
-int t_scs = 0;
+int t_scs = 2;
 
-int percentage = 25; // N% written as a whole (e.g. 10 = 10%)
-//int percentage = 50; // N% written as a whole (e.g. 10 = 10%)
-//int percentage = 75; // N% written as a whole (e.g. 10 = 10%)
-//int percentage = 100; // N% written as a whole (e.g. 10 = 10%)
-int n_percentage; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
+int percentage25 = 25; // N% written as a whole (e.g. 10 = 10%)
+int percentage50 = 50; // N% written as a whole (e.g. 10 = 10%)
+int percentage75 = 75; // N% written as a whole (e.g. 10 = 10%)
+int percentage100 = 100; // N% written as a whole (e.g. 10 = 10%)
+int n_percentage25; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
+int n_percentage50; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
+int n_percentage75; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
+int n_percentage100; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
 
 void initializeQueries(){
-     n_percentage = (N_CIVILIAN * percentage * 10 + 500) / 1000; 
+     n_percentage25 = (N_CIVILIAN * percentage25 * 10 + 500) / 1000;
+     n_percentage50 = (N_CIVILIAN * percentage50 * 10 + 500) / 1000; 
+     n_percentage75 = (N_CIVILIAN * percentage75 * 10 + 500) / 1000; 
+     n_percentage100 = (N_CIVILIAN * percentage100 * 10 + 500) / 1000;  
 }
 
 // Checks if the positions of the civilians are different
@@ -1348,7 +1355,7 @@ comm_victim_id = readMessageSingle(civilian_id)</label>
 	<system>// Templates instantiations
 initializer = Initializer();
 
-
+/*
 // &lt;---- SYSTEM 1 ----&gt;
 drone0 = Drone(drone_ids[0], drone_nvs[0]);
 drone1 = Drone(drone_ids[1], drone_nvs[1]);
@@ -1362,13 +1369,12 @@ civ2 = Civilian(civilian_ids[2], civilian_tvs[2], civilian_tzrs[2]);
 
 system initializer, drone0, drone1, fr0, fr1, civ0, civ1, civ2;
 // &lt;---- END SYSTEM 1 ----&gt;
+*/
 
 
-/*
 // &lt;---- SYSTEM 2 ----&gt;
 drone0 = Drone(drone_ids[0], drone_nvs[0]);
 drone1 = Drone(drone_ids[1], drone_nvs[1]);
-drone2 = Drone(drone_ids[2], drone_nvs[2]);
 
 fr0 = FirstResponder(first_responder_ids[0], first_responder_tfrs[0]);
 fr1 = FirstResponder(first_responder_ids[1], first_responder_tfrs[1]);
@@ -1386,10 +1392,11 @@ civ6 = Civilian(civilian_ids[6], civilian_tvs[6], civilian_tzrs[6]);
 civ7 = Civilian(civilian_ids[7], civilian_tvs[7], civilian_tzrs[7]);
 civ8 = Civilian(civilian_ids[8], civilian_tvs[8], civilian_tzrs[8]);
 civ9 = Civilian(civilian_ids[9], civilian_tvs[9], civilian_tzrs[9]);
+civ10 = Civilian(civilian_ids[10], civilian_tvs[10], civilian_tzrs[10]);
 
-system initializer, drone0, drone1, drone2, fr0, fr1, fr2, fr3, fr4, civ0, civ1, civ2, civ3, civ4, civ5, civ6, civ7, civ8, civ9;
+system initializer, drone0, drone1, fr0, fr1, fr2, fr3, fr4, civ0, civ1, civ2, civ3, civ4, civ5, civ6, civ7, civ8, civ9, civ10;
 // &lt;---- END SYSTEM 2 ----&gt;
-*/
+
 
 /*
 // &lt;---- SYSTEM 3 ----&gt;
@@ -1410,22 +1417,47 @@ system initializer, drone0, drone1, fr0, fr1, civ0, civ1, civ2, civ3;
 	<queries>
 		<option key="--diagnostic" value="1"/>
 		<query>
-			<formula>E&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized </formula>
+			<formula>E&lt;&gt; n_safe &gt;= 3 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized </formula>
 			<comment>Checks that it is possible for a percentage N% of all civilians to reach a safe state within time Tscs.
 
 i.e. checks for a upper bound.</comment>
-			<result outcome="failure" type="quality" timestamp="2024-07-20 15:27:18 +0200">
+		</query>
+		<query>
+			<formula>E&lt;&gt; n_safe &gt;= 2 &amp;&amp; initializer.Initialized </formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>E&lt;&gt; n_safe &gt;= n_percentage50 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized </formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>E&lt;&gt; n_safe &gt;= n_percentage75 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized </formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>E&lt;&gt; n_safe &gt;= n_percentage100 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized </formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>A&lt;&gt; n_safe &gt;= n_percentage25 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
+			<comment>Checks that a percentage N% of all civilians is always guaranteed to reach a safe state within time Tscs.
+
+i.e. checks for a lower bound.</comment>
+			<result outcome="failure" type="quality" timestamp="2024-07-20 23:25:36 +0200">
 				<option key="--diagnostic" value="1"/>
 			</result>
 		</query>
 		<query>
-			<formula>A&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
-			<comment>Checks that a percentage N% of all civilians is always guaranteed to reach a safe state within time Tscs.
-
-i.e. checks for a lower bound.</comment>
-			<result outcome="failure" type="quality" timestamp="2024-07-20 15:25:55 +0200">
-				<option key="--diagnostic" value="1"/>
-			</result>
+			<formula>A&lt;&gt; n_safe &gt;= n_percentage50 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>A&lt;&gt; n_safe &gt;= n_percentage75 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>A&lt;&gt; n_safe &gt;= n_percentage100 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
+			<comment/>
 		</query>
 		<query>
 			<formula>A[] (initializer.Start &amp;&amp; !areDifferent()) || (initializer.Initialized &amp;&amp; areDifferent())</formula>
