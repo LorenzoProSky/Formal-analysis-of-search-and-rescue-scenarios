@@ -921,7 +921,7 @@ fEnergyUsed(first_responder_id)</label>
 			<source ref="id21"/>
 			<target ref="id29"/>
 			<label kind="guard" x="-1479" y="-1836">amFatigued()</label>
-			<label kind="assignment" x="-1606" y="-1819">available_rescue_entities--</label>
+			<label kind="assignment" x="-1615" y="-1819">available_rescue_entities--</label>
 			<nail x="-1368" y="-1700"/>
 		</transition>
 		<transition id="id33">
@@ -1175,9 +1175,11 @@ void prepareNewCommunication() {
 		</transition>
 		<transition id="id70">
 			<source ref="id64"/>
-			<target ref="id60"/>
+			<target ref="id66"/>
 			<label kind="assignment" x="-526" y="-1879">prepareNewCommunication(),cEnergyUsed(civilian_id)</label>
-			<nail x="-1324" y="-1853"/>
+			<nail x="-1241" y="-1853"/>
+			<nail x="-1241" y="-1938"/>
+			<nail x="-1640" y="-1938"/>
 		</transition>
 		<transition id="id71">
 			<source ref="id62"/>
@@ -1220,9 +1222,9 @@ x &gt;= getDistanceCF(civilian_id,comm_first_responder_id)</label>
 		<transition id="id77">
 			<source ref="id60"/>
 			<target ref="id48"/>
-			<label kind="select" x="-1614" y="-1921">direction : int[0,3]</label>
-			<label kind="guard" x="-1946" y="-1904">canMove(direction,c_position[civilian_id]) &amp;&amp; !amExhausted()</label>
-			<label kind="assignment" x="-1955" y="-1887">move(direction,civilian_id,CIVILIAN),cEnergyUsed(civilian_id)</label>
+			<label kind="select" x="-1632" y="-1921">direction : int[0,3]</label>
+			<label kind="guard" x="-1980" y="-1904">canMove(direction,c_position[civilian_id]) &amp;&amp; !amExhausted()</label>
+			<label kind="assignment" x="-1989" y="-1887">move(direction,civilian_id,CIVILIAN),cEnergyUsed(civilian_id)</label>
 			<nail x="-1436" y="-1853"/>
 			<nail x="-2694" y="-1853"/>
 		</transition>
@@ -1431,6 +1433,10 @@ i.e. checks for a lower bound.</comment>
 			<result outcome="success" type="quality" timestamp="2024-07-20 15:25:59 +0200">
 				<option key="--diagnostic" value="1"/>
 			</result>
+		</query>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment/>
 		</query>
 	</queries>
 </nta>
