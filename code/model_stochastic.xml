@@ -381,6 +381,8 @@ void move(int direction, int entity_id, int entity_type) {
         current_position = f_position[entity_id];
         if (map[current_position.r][current_position.c] == CONTACTED_FIRST_RESPONDER)
             entity_type = CONTACTED_FIRST_RESPONDER;
+        else if (map[current_position.r][current_position.c] == FATIGUED_FIRST_RESPONDER)
+            entity_type = FATIGUED_FIRST_RESPONDER;
 
         new_position = getNewPosition(direction, current_position);
         f_position[entity_id] = new_position;
@@ -870,7 +872,7 @@ int contacting_survivor_id = -1;
 
 // ---- Private First-Responder's functions ----
 // Checks if there is a victim or an exhausted civilian within a 1-cell range to save
-// If there is more than one victim save the one with largest tv
+// If there is more than one civilian save the one with largest tv
 void detectVictim() {
     position current_position = f_position[first_responder_id];
     int detected_victim_tv = -1;
@@ -885,7 +887,7 @@ void detectVictim() {
 
                 if (temp_victim_id != -1) {
                     temp_victim_tv = civilian_tvs[temp_victim_id];
-                    // Select the victim with greatest tv
+                    // Select the civilian with greatest tv
                     if (temp_victim_tv &gt; detected_victim_tv) {
                         detected_victim_id = temp_victim_id;
                         detected_victim_tv = temp_victim_tv;
@@ -965,14 +967,13 @@ void readMessageFromContactingCivilian() {
 		<transition id="id35">
 			<source ref="id34"/>
 			<target ref="id25"/>
-			<label kind="assignment" x="-1300" y="-1819">prepareNewRescue(),
-fEnergyUsed(first_responder_id)</label>
+			<label kind="assignment" x="-1300" y="-1793">prepareNewRescue()</label>
 			<nail x="-1300" y="-1768"/>
 		</transition>
 		<transition id="id36">
 			<source ref="id25"/>
 			<target ref="id33"/>
-			<label kind="guard" x="-1479" y="-1836">amFatigued()</label>
+			<label kind="guard" x="-1487" y="-1836">amFatigued()</label>
 			<label kind="assignment" x="-1615" y="-1819">available_rescue_entities--</label>
 			<nail x="-1368" y="-1700"/>
 		</transition>
@@ -1012,7 +1013,7 @@ fEnergyUsed(first_responder_id)</label>
 			<target ref="id25"/>
 			<label kind="select" x="-1283" y="-1453">direction : int[0,4]</label>
 			<label kind="guard" x="-1283" y="-1436">canMove(direction,f_position[first_responder_id])</label>
-			<label kind="assignment" x="-1283" y="-1419">move(direction,first_responder_id,FIRST_RESPONDER),fEnergyUsed(first_responder_id)</label>
+			<label kind="assignment" x="-1283" y="-1419">move(direction,first_responder_id,FIRST_RESPONDER)</label>
 			<nail x="-1300" y="-1462"/>
 		</transition>
 		<transition id="id43">
@@ -1053,15 +1054,16 @@ fEnergyUsed(first_responder_id)</label>
 			<source ref="id26"/>
 			<target ref="id34"/>
 			<label kind="guard" x="-238" y="-1717">x &gt;= tfr</label>
-			<label kind="synchronisation" x="-510" y="-1700">rescue_completed_msg[detected_victim_id]!</label>
+			<label kind="synchronisation" x="-527" y="-1700">rescue_completed_msg[detected_victim_id]!</label>
 			<nail x="-153" y="-1725"/>
 			<nail x="-926" y="-1725"/>
 		</transition>
 		<transition id="id49">
 			<source ref="id25"/>
 			<target ref="id24"/>
-			<label kind="guard" x="-1198" y="-1649">amFirstResponder()</label>
-			<label kind="assignment" x="-1181" y="-1632">detectVictim()</label>
+			<label kind="guard" x="-1249" y="-1674">amFirstResponder()</label>
+			<label kind="assignment" x="-1249" y="-1657">detectVictim(),
+fEnergyUsed(first_responder_id)</label>
 		</transition>
 		<transition id="id50">
 			<source ref="id23"/>
