@@ -1517,6 +1517,13 @@ system initializer, drone0, drone1, drone2, drone3, fr0, fr1, fr2, fr3, fr4, civ
 		<query>
 			<formula>A&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
 			<comment/>
+			<result outcome="failure" type="quality" timestamp="2024-07-22 00:04:55 +0200">
+				<option key="--diagnostic" value="1"/>
+			</result>
+		</query>
+		<query>
+			<formula>Pr[&lt;=10](&lt;&gt; 5==5 )</formula>
+			<comment/>
 		</query>
 		<query>
 			<formula>A[] (initializer.Start &amp;&amp; !areDifferent()) || (initializer.Initialized &amp;&amp; areDifferent())</formula>
