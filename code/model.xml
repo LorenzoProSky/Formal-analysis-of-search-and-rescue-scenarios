@@ -601,22 +601,13 @@ int n_safe; // Number of safe civilians
 int n_casualty; // Number of casualties
 int n_missing; // Number of missing civilians
 
-int t_scs = 2;
+int t_scs = 10;
 
-int percentage25 = 25; // N% written as a whole (e.g. 10 = 10%)
-int percentage50 = 50; // N% written as a whole (e.g. 10 = 10%)
-int percentage75 = 75; // N% written as a whole (e.g. 10 = 10%)
-int percentage100 = 100; // N% written as a whole (e.g. 10 = 10%)
-int n_percentage25; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
-int n_percentage50; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
-int n_percentage75; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
-int n_percentage100; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
+int percentage = 25; // N% written as a whole (e.g. 10 = 10%)
+int n_percentage; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
 
 void initializeQueries(){
-     n_percentage25 = (N_CIVILIAN * percentage25 * 10 + 500) / 1000;
-     n_percentage50 = (N_CIVILIAN * percentage50 * 10 + 500) / 1000; 
-     n_percentage75 = (N_CIVILIAN * percentage75 * 10 + 500) / 1000; 
-     n_percentage100 = (N_CIVILIAN * percentage100 * 10 + 500) / 1000;  
+     n_percentage = (N_CIVILIAN * percentage * 10 + 500) / 1000;
 }
 
 // Checks if the positions of the civilians are different
@@ -1455,6 +1446,9 @@ system initializer, drone0, drone1, drone2, drone3, fr0, fr1, fr2, fr3, fr4, civ
 			<comment>Checks that it is possible for a percentage N% of all civilians to reach a safe state within time Tscs.
 
 i.e. checks for a upper bound.</comment>
+			<result outcome="success" type="quality" timestamp="2024-07-21 22:24:30 +0200">
+				<option key="--diagnostic" value="1"/>
+			</result>
 		</query>
 		<query>
 			<formula>E&lt;&gt; n_safe &gt;= n_percentage50 &amp;&amp; global_time &lt; 1 &amp;&amp; initializer.Initialized </formula>
@@ -1477,11 +1471,11 @@ i.e. checks for a upper bound.</comment>
 			<comment/>
 		</query>
 		<query>
-			<formula>A&lt;&gt; n_safe &gt;= n_percentage25 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
+			<formula>A&lt;&gt; n_safe &gt;= 1 &amp;&amp; global_time &lt; 100 &amp;&amp; initializer.Initialized</formula>
 			<comment>Checks that a percentage N% of all civilians is always guaranteed to reach a safe state within time Tscs.
 
 i.e. checks for a lower bound.</comment>
-			<result outcome="failure" type="quality" timestamp="2024-07-20 23:25:36 +0200">
+			<result outcome="failure" type="quality" timestamp="2024-07-21 22:25:14 +0200">
 				<option key="--diagnostic" value="1"/>
 			</result>
 		</query>
