@@ -25,9 +25,9 @@ typedef struct {
     int c;
 } position;
 
-
 // ---- SYSTEM DEFINITIONS ----&gt;
 
+/*
 // &lt;---- SYSTEM 1 ----&gt;
 const int N_ROW = 10;
 const int N_COL = 8;
@@ -55,14 +55,16 @@ position f_position[N_FIRST_RESPONDER]; // First responders positions
 // Map initialization of the FIRE and EXITS
 // Top left cell is at position (0,0) and the bottom right is at (N_ROW - 1, N_COL - 1)
 int map[N_ROW][N_COL] = {
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,4,4,0,0,0,0,0,0,0},
-        {0,4,4,0,0,0,0,0,0,0},
-        {0,0,4,4,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0}, 
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,1,1,0,0}
+        {0,0,0,0,0,0,0,0},
+        {0,4,4,0,0,0,0,0},
+        {0,4,4,0,0,0,0,0},
+        {0,0,4,4,0,0,0,0},
+        {0,0,0,0,0,0,0,0}, 
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,1,1}
  }; // 8x10
 
 // Initialize the entities positions
@@ -84,7 +86,7 @@ void initializePositions() {
     d0.r = 0;
     d0.c = 2;
     d1.r = 0;
-    d1.c = 5;
+    d1.c = 7;
     d_position[0] = d0;
     d_position[1] = d1;
 
@@ -110,7 +112,6 @@ void initializePositions() {
 // &lt;---- END SYSTEM 1 ----&gt;
 
 
-/*
 // &lt;---- SYSTEM 2 ----&gt;
 const int N_ROW = 20;
 const int N_COL = 14;
@@ -120,10 +121,12 @@ const int N_CIVILIAN = 11;
 
 const int drone_ids[N_DRONE] = {0,1};
 const int drone_nvs[N_DRONE] = {3,3};
+const int drone_pfails[N_DRONE] = {5,10}; // %
 
 const int civilian_ids[N_CIVILIAN] = {0,1,2,3,4,5,6,7,8,9,10};
 const int civilian_tvs[N_CIVILIAN] = {15,18,20,22,25,17,19,21,23,24,21};
 const int civilian_tzrs[N_CIVILIAN] = {6,6,6,6,6,6,6,6,6,6,6};
+const int civilian_plistens[N_CIVILIAN] = {90,85,70,95,100,75,80,85,90,80,95}; // %
 
 const int first_responder_ids[N_FIRST_RESPONDER] = {0,1,2,3,4};
 const int first_responder_tfrs[N_FIRST_RESPONDER] = {8,8,8,8,8};
@@ -213,7 +216,6 @@ void initializePositions() {
 // &lt;---- END SYSTEM 2 ----&gt;
 */
 
-/*
 // &lt;---- SYSTEM 3 ----&gt;
 const int N_ROW = 18;
 const int N_COL = 12;
@@ -223,10 +225,12 @@ const int N_CIVILIAN = 10;
 
 const int drone_ids[N_DRONE] = {0,1,2,3};
 const int drone_nvs[N_DRONE] = {1,1,1,1};
+const int drone_pfails[N_DRONE] = {5,10,7,8}; // %
 
 const int civilian_ids[N_CIVILIAN] = {0,1,2,3,4,5,6,7,8,9};
 const int civilian_tvs[N_CIVILIAN] = {15,18,20,22,25,17,19,21,23,24};
 const int civilian_tzrs[N_CIVILIAN] = {6,6,6,6,6,6,6,6,6,6};
+const int civilian_plistens[N_CIVILIAN] = {90,85,70,95,100,75,80,85,90,80}; // %
 
 const int first_responder_ids[N_FIRST_RESPONDER] = {0,1,2,3,4};
 const int first_responder_tfrs[N_FIRST_RESPONDER] = {8,8,8,8,8};
@@ -263,9 +267,9 @@ void initializePositions() {
     // Drones
     position d0, d1, d2, d3;
     // Civilians
-    position c0, c1, c2, c3;
+    position c0, c1, c2, c3, c4, c5, c6, c7, c8, c9;
     // First responders
-    position f0, f1;
+    position f0, f1, f2, f3, f4;
 
     // Initialize drone positions
     d0.r = 0; d0.c = 1;
@@ -278,24 +282,41 @@ void initializePositions() {
     d_position[3] = d3;
 
     // Initialize civilian positions
-    c0.r = 5; c0.c = 3;
-    c1.r = 5; c1.c = 8;
-    c2.r = 12; c2.c = 2;
-    c3.r = 12; c3.c = 9;
+    c0.r = 0; c0.c = 0;
+    c1.r = 0; c1.c = 11;
+    c2.r = 6; c2.c = 2;
+    c3.r = 7; c3.c = 9;
+    c4.r = 12; c4.c = 11;
+    c5.r = 15; c5.c = 5;
+    c6.r = 15; c6.c = 9;
+    c7.r = 17; c7.c = 3;
+    c8.r = 17; c8.c = 7;
+    c9.r = 17; c9.c = 5;
     c_position[0] = c0;
     c_position[1] = c1;
     c_position[2] = c2;
     c_position[3] = c3;
+    c_position[4] = c4;
+    c_position[5] = c5;
+    c_position[6] = c6;
+    c_position[7] = c7;
+    c_position[8] = c8;
+    c_position[9] = c9;
 
     // Initialize first responders positions
-    f0.r = 17; f0.c = 1;
-    f1.r = 17; f1.c = 10;
+    f0.r = 10; f0.c = 9;
+    f1.r = 13; f1.c = 5;
+    f2.r = 3; f2.c = 5;
+    f3.r = 7; f3.c = 0;
+    f4.r = 1; f4.c = 11;
     f_position[0] = f0;
     f_position[1] = f1;
+    f_position[2] = f2;
+    f_position[3] = f3;
+    f_position[4] = f4;
+
 }
 // &lt;---- END SYSTEM 3 ----&gt;
-*/
-
 
 // ---- MOVEMENT ----
 // Directions
@@ -604,22 +625,13 @@ int n_safe; // Number of safe civilians
 int n_casualty; // Number of casualties
 int n_missing; // Number of missing civilians
 
-int t_scs = 2;
+int t_scs = 10;
 
-int percentage25 = 25; // N% written as a whole (e.g. 10 = 10%)
-int percentage50 = 50; // N% written as a whole (e.g. 10 = 10%)
-int percentage75 = 75; // N% written as a whole (e.g. 10 = 10%)
-int percentage100 = 100; // N% written as a whole (e.g. 10 = 10%)
-int n_percentage25; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
-int n_percentage50; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
-int n_percentage75; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
-int n_percentage100; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
+int percentage = 25; // N% written as a whole (e.g. 10 = 10%)
+int n_percentage; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
 
 void initializeQueries(){
-     n_percentage25 = (N_CIVILIAN * percentage25 * 10 + 500) / 1000;
-     n_percentage50 = (N_CIVILIAN * percentage50 * 10 + 500) / 1000; 
-     n_percentage75 = (N_CIVILIAN * percentage75 * 10 + 500) / 1000; 
-     n_percentage100 = (N_CIVILIAN * percentage100 * 10 + 500) / 1000;  
+     n_percentage = (N_CIVILIAN * percentage * 10 + 500) / 1000;
 }
 
 // Checks if the positions of the civilians are different
@@ -1426,7 +1438,7 @@ comm_victim_id = readMessageSingle(civilian_id,true)</label>
 	<system>// Templates instantiations
 initializer = Initializer();
 
-
+/*
 // &lt;---- SYSTEM 1 ----&gt;
 drone0 = Drone(drone_ids[0], drone_nvs[0], drone_pfails[0]);
 drone1 = Drone(drone_ids[1], drone_nvs[1], drone_pfails[1]);
@@ -1442,10 +1454,10 @@ system initializer, drone0, drone1, fr0, fr1, civ0, civ1, civ2;
 // &lt;---- END SYSTEM 1 ----&gt;
 
 
-/*
+
 // &lt;---- SYSTEM 2 ----&gt;
-drone0 = Drone(drone_ids[0], drone_nvs[0]);
-drone1 = Drone(drone_ids[1], drone_nvs[1]);
+drone0 = Drone(drone_ids[0], drone_nvs[0], drone_pfails[0]);
+drone1 = Drone(drone_ids[1], drone_nvs[1], drone_pfails[1]);
 
 fr0 = FirstResponder(first_responder_ids[0], first_responder_tfrs[0]);
 fr1 = FirstResponder(first_responder_ids[1], first_responder_tfrs[1]);
@@ -1453,81 +1465,57 @@ fr2 = FirstResponder(first_responder_ids[2], first_responder_tfrs[2]);
 fr3 = FirstResponder(first_responder_ids[3], first_responder_tfrs[3]);
 fr4 = FirstResponder(first_responder_ids[4], first_responder_tfrs[4]);
 
-civ0 = Civilian(civilian_ids[0], civilian_tvs[0], civilian_tzrs[0]);
-civ1 = Civilian(civilian_ids[1], civilian_tvs[1], civilian_tzrs[1]);
-civ2 = Civilian(civilian_ids[2], civilian_tvs[2], civilian_tzrs[2]);
-civ3 = Civilian(civilian_ids[3], civilian_tvs[3], civilian_tzrs[3]);
-civ4 = Civilian(civilian_ids[4], civilian_tvs[4], civilian_tzrs[4]);
-civ5 = Civilian(civilian_ids[5], civilian_tvs[5], civilian_tzrs[5]);
-civ6 = Civilian(civilian_ids[6], civilian_tvs[6], civilian_tzrs[6]);
-civ7 = Civilian(civilian_ids[7], civilian_tvs[7], civilian_tzrs[7]);
-civ8 = Civilian(civilian_ids[8], civilian_tvs[8], civilian_tzrs[8]);
-civ9 = Civilian(civilian_ids[9], civilian_tvs[9], civilian_tzrs[9]);
-civ10 = Civilian(civilian_ids[10], civilian_tvs[10], civilian_tzrs[10]);
+civ0 = Civilian(civilian_ids[0], civilian_tvs[0], civilian_tzrs[0], civilian_plistens[0]);
+civ1 = Civilian(civilian_ids[1], civilian_tvs[1], civilian_tzrs[1], civilian_plistens[1]);
+civ2 = Civilian(civilian_ids[2], civilian_tvs[2], civilian_tzrs[2], civilian_plistens[2]);
+civ3 = Civilian(civilian_ids[3], civilian_tvs[3], civilian_tzrs[3], civilian_plistens[3]);
+civ4 = Civilian(civilian_ids[4], civilian_tvs[4], civilian_tzrs[4], civilian_plistens[4]);
+civ5 = Civilian(civilian_ids[5], civilian_tvs[5], civilian_tzrs[5], civilian_plistens[5]);
+civ6 = Civilian(civilian_ids[6], civilian_tvs[6], civilian_tzrs[6], civilian_plistens[6]);
+civ7 = Civilian(civilian_ids[7], civilian_tvs[7], civilian_tzrs[7], civilian_plistens[7]);
+civ8 = Civilian(civilian_ids[8], civilian_tvs[8], civilian_tzrs[8], civilian_plistens[8]);
+civ9 = Civilian(civilian_ids[9], civilian_tvs[9], civilian_tzrs[9], civilian_plistens[9]);
+civ10 = Civilian(civilian_ids[10], civilian_tvs[10], civilian_tzrs[10], civilian_plistens[10]);
 
 system initializer, drone0, drone1, fr0, fr1, fr2, fr3, fr4, civ0, civ1, civ2, civ3, civ4, civ5, civ6, civ7, civ8, civ9, civ10;
 // &lt;---- END SYSTEM 2 ----&gt;
-/*
 
-/*
+*/
+
 // &lt;---- SYSTEM 3 ----&gt;
-drone0 = Drone(drone_ids[0], drone_nvs[0]);
-drone1 = Drone(drone_ids[1], drone_nvs[1]);
+drone0 = Drone(drone_ids[0], drone_nvs[0], drone_pfails[0]);
+drone1 = Drone(drone_ids[1], drone_nvs[1], drone_pfails[1]);
+drone2 = Drone(drone_ids[2], drone_nvs[2], drone_pfails[2]);
+drone3 = Drone(drone_ids[3], drone_nvs[3], drone_pfails[3]);
 
 fr0 = FirstResponder(first_responder_ids[0], first_responder_tfrs[0]);
 fr1 = FirstResponder(first_responder_ids[1], first_responder_tfrs[1]);
+fr2 = FirstResponder(first_responder_ids[2], first_responder_tfrs[2]);
+fr3 = FirstResponder(first_responder_ids[3], first_responder_tfrs[3]);
+fr4 = FirstResponder(first_responder_ids[4], first_responder_tfrs[4]);
 
-civ0 = Civilian(civilian_ids[0], civilian_tvs[0], civilian_tzrs[0]);
-civ1 = Civilian(civilian_ids[1], civilian_tvs[1], civilian_tzrs[1]);
-civ2 = Civilian(civilian_ids[2], civilian_tvs[2], civilian_tzrs[2]);
-civ3 = Civilian(civilian_ids[3], civilian_tvs[3], civilian_tzrs[3]);
+civ0 = Civilian(civilian_ids[0], civilian_tvs[0], civilian_tzrs[0], civilian_plistens[0]);
+civ1 = Civilian(civilian_ids[1], civilian_tvs[1], civilian_tzrs[1], civilian_plistens[1]);
+civ2 = Civilian(civilian_ids[2], civilian_tvs[2], civilian_tzrs[2], civilian_plistens[2]);
+civ3 = Civilian(civilian_ids[3], civilian_tvs[3], civilian_tzrs[3], civilian_plistens[3]);
+civ4 = Civilian(civilian_ids[4], civilian_tvs[4], civilian_tzrs[4], civilian_plistens[4]);
+civ5 = Civilian(civilian_ids[5], civilian_tvs[5], civilian_tzrs[5], civilian_plistens[5]);
+civ6 = Civilian(civilian_ids[6], civilian_tvs[6], civilian_tzrs[6], civilian_plistens[6]);
+civ7 = Civilian(civilian_ids[7], civilian_tvs[7], civilian_tzrs[7], civilian_plistens[7]);
+civ8 = Civilian(civilian_ids[8], civilian_tvs[8], civilian_tzrs[8], civilian_plistens[8]);
+civ9 = Civilian(civilian_ids[9], civilian_tvs[9], civilian_tzrs[9], civilian_plistens[9]);
 
-system initializer, drone0, drone1, fr0, fr1, civ0, civ1, civ2, civ3;
+system initializer, drone0, drone1, drone2, drone3, fr0, fr1, fr2, fr3, fr4, civ0, civ1, civ2, civ3, civ4, civ5, civ6, civ7, civ8, civ9;
 // &lt;---- END SYSTEM 3 ----&gt;
-*/</system>
+</system>
 	<queries>
 		<option key="--diagnostic" value="1"/>
 		<query>
-			<formula>E&lt;&gt; n_safe &gt;= 3 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized </formula>
-			<comment>Checks that it is possible for a percentage N% of all civilians to reach a safe state within time Tscs.
-
-i.e. checks for a upper bound.</comment>
-		</query>
-		<query>
-			<formula>E&lt;&gt; n_safe &gt;= 2 &amp;&amp; initializer.Initialized </formula>
+			<formula>E&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized </formula>
 			<comment/>
 		</query>
 		<query>
-			<formula>E&lt;&gt; n_safe &gt;= n_percentage50 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized </formula>
-			<comment/>
-		</query>
-		<query>
-			<formula>E&lt;&gt; n_safe &gt;= n_percentage75 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized </formula>
-			<comment/>
-		</query>
-		<query>
-			<formula>E&lt;&gt; n_safe &gt;= n_percentage100 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized </formula>
-			<comment/>
-		</query>
-		<query>
-			<formula>A&lt;&gt; n_safe &gt;= n_percentage25 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
-			<comment>Checks that a percentage N% of all civilians is always guaranteed to reach a safe state within time Tscs.
-
-i.e. checks for a lower bound.</comment>
-			<result outcome="failure" type="quality" timestamp="2024-07-20 23:25:36 +0200">
-				<option key="--diagnostic" value="1"/>
-			</result>
-		</query>
-		<query>
-			<formula>A&lt;&gt; n_safe &gt;= n_percentage50 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
-			<comment/>
-		</query>
-		<query>
-			<formula>A&lt;&gt; n_safe &gt;= n_percentage75 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
-			<comment/>
-		</query>
-		<query>
-			<formula>A&lt;&gt; n_safe &gt;= n_percentage100 &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
+			<formula>A&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
 			<comment/>
 		</query>
 		<query>
@@ -1536,10 +1524,6 @@ i.e. checks for a lower bound.</comment>
 			<result outcome="success" type="quality" timestamp="2024-07-20 15:25:59 +0200">
 				<option key="--diagnostic" value="1"/>
 			</result>
-		</query>
-		<query>
-			<formula>A[] not deadlock</formula>
-			<comment/>
 		</query>
 	</queries>
 </nta>
