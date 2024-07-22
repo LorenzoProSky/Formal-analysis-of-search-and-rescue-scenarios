@@ -27,7 +27,7 @@ typedef struct {
 
 // ---- SYSTEM DEFINITIONS ----&gt;
 
-/*
+
 // &lt;---- SYSTEM 1 ----&gt;
 const int N_ROW = 10;
 const int N_COL = 8;
@@ -110,7 +110,7 @@ void initializePositions() {
     f_position[1] = f1;
 }
 // &lt;---- END SYSTEM 1 ----&gt;
-*/
+/*
 
 // &lt;---- SYSTEM 2 ----&gt;
 const int N_ROW = 20;
@@ -215,7 +215,7 @@ void initializePositions() {
 }
 // &lt;---- END SYSTEM 2 ----&gt;
 
-/*
+
 // &lt;---- SYSTEM 3 ----&gt;
 const int N_ROW = 18;
 const int N_COL = 12;
@@ -630,7 +630,7 @@ int n_missing; // Number of missing civilians
 
 int t_scs = 10;
 
-int percentage = 25; // N% written as a whole (e.g. 10 = 10%)
+int percentage = 50; // N% written as a whole (e.g. 10 = 10%)
 int n_percentage; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
 
 void initializeQueries(){
@@ -1463,7 +1463,7 @@ comm_victim_id = readMessageSingle(civilian_id,true)</label>
 	<system>// Templates instantiations
 initializer = Initializer();
 
-/*
+
 // &lt;---- SYSTEM 1 ----&gt;
 drone0 = Drone(drone_ids[0], drone_nvs[0], drone_pfails[0]);
 drone1 = Drone(drone_ids[1], drone_nvs[1], drone_pfails[1]);
@@ -1479,7 +1479,7 @@ system initializer, drone0, drone1, fr0, fr1, civ0, civ1, civ2;
 // &lt;---- END SYSTEM 1 ----&gt;
 
 
-*/
+/*
 // &lt;---- SYSTEM 2 ----&gt;
 drone0 = Drone(drone_ids[0], drone_nvs[0], drone_pfails[0]);
 drone1 = Drone(drone_ids[1], drone_nvs[1], drone_pfails[1]);
@@ -1506,7 +1506,7 @@ system initializer, drone0, drone1, fr0, fr1, fr2, fr3, fr4, civ0, civ1, civ2, c
 // &lt;---- END SYSTEM 2 ----&gt;
 
 
-/*
+
 // &lt;---- SYSTEM 3 ----&gt;
 drone0 = Drone(drone_ids[0], drone_nvs[0], drone_pfails[0]);
 drone1 = Drone(drone_ids[1], drone_nvs[1], drone_pfails[1]);
@@ -1542,16 +1542,12 @@ system initializer, drone0, drone1, drone2, drone3, fr0, fr1, fr2, fr3, fr4, civ
 		<query>
 			<formula>A&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
 			<comment/>
-			<result outcome="failure" type="quality" timestamp="2024-07-22 00:04:55 +0200">
+			<result outcome="failure" type="quality" timestamp="2024-07-22 19:14:31 +0200">
 				<option key="--diagnostic" value="1"/>
 			</result>
 		</query>
 		<query>
-			<formula>Pr[&lt;=2](&lt;&gt; n_safe&gt;= n_percentage &amp;&amp; initializer.Initialized)</formula>
-			<comment/>
-		</query>
-		<query>
-			<formula>A[] (not deadlock)</formula>
+			<formula>Pr[&lt;=100](&lt;&gt; n_safe&gt;= n_percentage &amp;&amp; initializer.Initialized)</formula>
 			<comment/>
 		</query>
 		<query>

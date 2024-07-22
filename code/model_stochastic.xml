@@ -1522,10 +1522,6 @@ system initializer, drone0, drone1, drone2, drone3, fr0, fr1, fr2, fr3, fr4, civ
 			</result>
 		</query>
 		<query>
-			<formula>Pr[&lt;=10](&lt;&gt; 5==5 )</formula>
-			<comment/>
-		</query>
-		<query>
 			<formula>A[] (initializer.Start &amp;&amp; !areDifferent()) || (initializer.Initialized &amp;&amp; areDifferent())</formula>
 			<comment>Checks that the positions of the civilians and first responders are always unique.</comment>
 			<result outcome="success" type="quality" timestamp="2024-07-20 15:25:59 +0200">
