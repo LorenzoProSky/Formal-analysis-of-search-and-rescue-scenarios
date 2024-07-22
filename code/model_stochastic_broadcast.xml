@@ -1,0 +1,1565 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>// Global declaration
+
+// ---- POSITIONS ----
+// Cell value type
+const int FREE = 0;
+const int EXIT = 1;
+const int CIVILIAN = 2;
+const int FIRST_RESPONDER = 3;
+const int FIRE = 4;
+const int VICTIM = 5;
+const int IN_ASSISTANCE = 6;
+const int ZERO_RESPONDER = 7;
+const int IN_CONTACT = 8;
+const int CONTACTED_FIRST_RESPONDER = 9;
+const int SAFE = 10; // In map 0
+const int CASUALTY = -1; // In map 0
+const int EXHAUSTED_CIVILIAN = 11;
+const int FATIGUED_FIRST_RESPONDER = 12;
+
+typedef struct {
+    int r;
+    int c;
+} position;
+
+// ---- SYSTEM DEFINITIONS ----&gt;
+
+/*
+// &lt;---- SYSTEM 1 ----&gt;
+const int N_ROW = 10;
+const int N_COL = 8;
+const int N_DRONE = 2;
+const int N_FIRST_RESPONDER = 2;
+const int N_CIVILIAN = 3;
+
+const int drone_ids[N_DRONE] = {0,1};
+const int drone_nvs[N_DRONE] = {2,2};
+const int drone_pfails[N_DRONE] = {5,10}; // %
+
+const int civilian_ids[N_CIVILIAN] = {0,1,2}; // 0 - N_CIVILIAN - 1
+const int civilian_tvs[N_CIVILIAN] = {10,2,11};
+const int civilian_tzrs[N_CIVILIAN] = {2,1,2};
+const int civilian_plistens[N_CIVILIAN] = {95,100,75}; // %
+
+const int first_responder_ids[N_FIRST_RESPONDER] = {0,1}; // 0 - N_FIRST_RESPONDER - 1
+const int first_responder_tfrs[N_FIRST_RESPONDER] = {3,2};
+
+// Arrays of positions of the entities
+position c_position[N_CIVILIAN]; // Civilians positions
+position d_position[N_DRONE]; // Drones positions
+position f_position[N_FIRST_RESPONDER]; // First responders positions
+
+// Map initialization of the FIRE and EXITS
+// Top left cell is at position (0,0) and the bottom right is at (N_ROW - 1, N_COL - 1)
+int map[N_ROW][N_COL] = {
+        {0,0,0,0,0,0,0,0},
+        {0,4,4,0,0,0,0,0},
+        {0,4,4,0,0,0,0,0},
+        {0,0,4,4,0,0,0,0},
+        {0,0,0,0,0,0,0,0}, 
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,1,1}
+ }; // 8x10
+
+// Initialize the entities positions
+void initializePositions() {
+    // Drones
+    position d0;
+    position d1;
+
+    // Civialians
+    position c0;
+    position c1;
+    position c2;
+
+    // First responders
+    position f0;
+    position f1;
+
+    // Initialize drone positions
+    d0.r = 0;
+    d0.c = 2;
+    d1.r = 0;
+    d1.c = 7;
+    d_position[0] = d0;
+    d_position[1] = d1;
+
+    // Initialize civilian positions
+    c0.r = 2;
+    c0.c = 3;
+    c1.r = 0;
+    c1.c = 7;
+    c2.r = 3;
+    c2.c = 4;
+    c_position[0] = c0;
+    c_position[1] = c1;
+    c_position[2] = c2;
+
+    // Initialize first responders positions
+    f0.r = 1;
+    f0.c = 6;
+    f1.r = 7;
+    f1.c = 2;
+    f_position[0] = f0;
+    f_position[1] = f1;
+}
+// &lt;---- END SYSTEM 1 ----&gt;
+*/
+
+// &lt;---- SYSTEM 2 ----&gt;
+const int N_ROW = 20;
+const int N_COL = 14;
+const int N_DRONE = 2;
+const int N_FIRST_RESPONDER = 5;
+const int N_CIVILIAN = 11;
+
+const int drone_ids[N_DRONE] = {0,1};
+const int drone_nvs[N_DRONE] = {3,3};
+const int drone_pfails[N_DRONE] = {5,10}; // %
+
+const int civilian_ids[N_CIVILIAN] = {0,1,2,3,4,5,6,7,8,9,10};
+const int civilian_tvs[N_CIVILIAN] = {15,18,20,22,25,17,19,21,23,24,21};
+const int civilian_tzrs[N_CIVILIAN] = {6,6,6,6,6,6,6,6,6,6,6};
+const int civilian_plistens[N_CIVILIAN] = {90,85,70,95,100,75,80,85,90,80,95}; // %
+
+const int first_responder_ids[N_FIRST_RESPONDER] = {0,1,2,3,4};
+const int first_responder_tfrs[N_FIRST_RESPONDER] = {8,8,8,8,8};
+
+// Arrays of positions of the entities
+position c_position[N_CIVILIAN]; // Civilians positions
+position d_position[N_DRONE]; // Drones positions
+position f_position[N_FIRST_RESPONDER]; // First responders positions
+
+// Map initialization of the FIRE and EXITS
+int map[N_ROW][N_COL] = {
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4},
+    {0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4},
+    {0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}
+}; // 20x14
+
+// Initialize the entities positions
+void initializePositions() {
+    // Drones
+    position d0, d1;
+    // Civilians
+    position c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10;
+    // First responders
+    position f0, f1, f2, f3, f4;
+
+    // Initialize drone positions
+    d0.r = 0; d0.c = 3;
+    d1.r = 0; d1.c = 10;
+    d_position[0] = d0;
+    d_position[1] = d1;
+
+    // Initialize civilian positions
+    c0.r = 17; c0.c = 3;
+    c1.r = 5; c1.c = 11;
+    c2.r = 10; c2.c = 7;
+    c3.r = 12; c3.c = 2;
+    c4.r = 12; c4.c = 12;
+    c5.r = 15; c5.c = 5;
+    c6.r = 15; c6.c = 9;
+    c7.r = 17; c7.c = 3;
+    c8.r = 17; c8.c = 7;
+    c9.r = 17; c9.c = 11;
+    c10.r = 19; c10.c = 2;
+    c_position[0] = c0;
+    c_position[1] = c1;
+    c_position[2] = c2;
+    c_position[3] = c3;
+    c_position[4] = c4;
+    c_position[5] = c5;
+    c_position[6] = c6;
+    c_position[7] = c7;
+    c_position[8] = c8;
+    c_position[9] = c9;
+    c_position[10] = c10;
+
+
+    // Initialize first responders positions
+    f0.r = 0; f0.c = 0;
+    f1.r = 11; f1.c = 13;
+    f2.r = 12; f2.c = 3;
+    f3.r = 12; f3.c = 7;
+    f4.r = 0; f4.c = 0;
+    f_position[0] = f0;
+    f_position[1] = f1;
+    f_position[2] = f2;
+    f_position[3] = f3;
+    f_position[4] = f4;
+
+}
+// &lt;---- END SYSTEM 2 ----&gt;
+
+/*
+// &lt;---- SYSTEM 3 ----&gt;
+const int N_ROW = 18;
+const int N_COL = 12;
+const int N_DRONE = 4;
+const int N_FIRST_RESPONDER = 5;
+const int N_CIVILIAN = 10;
+
+const int drone_ids[N_DRONE] = {0,1,2,3};
+const int drone_nvs[N_DRONE] = {1,1,1,1};
+const int drone_pfails[N_DRONE] = {5,10,7,8}; // %
+
+const int civilian_ids[N_CIVILIAN] = {0,1,2,3,4,5,6,7,8,9};
+const int civilian_tvs[N_CIVILIAN] = {15,18,20,22,25,17,19,21,23,24};
+const int civilian_tzrs[N_CIVILIAN] = {6,6,6,6,6,6,6,6,6,6};
+const int civilian_plistens[N_CIVILIAN] = {90,85,70,95,100,75,80,85,90,80}; // %
+
+const int first_responder_ids[N_FIRST_RESPONDER] = {0,1,2,3,4};
+const int first_responder_tfrs[N_FIRST_RESPONDER] = {8,8,8,8,8};
+
+// Arrays of positions of the entities
+position c_position[N_CIVILIAN]; // Civilians positions
+position d_position[N_DRONE]; // Drones positions
+position f_position[N_FIRST_RESPONDER]; // First responders positions
+
+// Map initialization of the FIRE and EXITS
+int map[N_ROW][N_COL] = {
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 4, 4, 4, 0, 0, 0, 0, 4, 4, 4, 0},
+    {0, 4, 4, 4, 0, 0, 0, 0, 4, 4, 4, 0},
+    {0, 4, 4, 4, 0, 0, 0, 0, 4, 4, 4, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}
+}; //18x12
+
+// Initialize the entities positions
+void initializePositions() {
+    // Drones
+    position d0, d1, d2, d3;
+    // Civilians
+    position c0, c1, c2, c3, c4, c5, c6, c7, c8, c9;
+    // First responders
+    position f0, f1, f2, f3, f4;
+
+    // Initialize drone positions
+    d0.r = 0; d0.c = 1;
+    d1.r = 0; d1.c = 4;
+    d2.r = 0; d2.c = 7;
+    d3.r = 0; d3.c = 10;
+    d_position[0] = d0;
+    d_position[1] = d1;
+    d_position[2] = d2;
+    d_position[3] = d3;
+
+    // Initialize civilian positions
+    c0.r = 0; c0.c = 0;
+    c1.r = 0; c1.c = 11;
+    c2.r = 6; c2.c = 2;
+    c3.r = 7; c3.c = 9;
+    c4.r = 12; c4.c = 11;
+    c5.r = 15; c5.c = 5;
+    c6.r = 15; c6.c = 9;
+    c7.r = 17; c7.c = 3;
+    c8.r = 17; c8.c = 7;
+    c9.r = 17; c9.c = 5;
+    c_position[0] = c0;
+    c_position[1] = c1;
+    c_position[2] = c2;
+    c_position[3] = c3;
+    c_position[4] = c4;
+    c_position[5] = c5;
+    c_position[6] = c6;
+    c_position[7] = c7;
+    c_position[8] = c8;
+    c_position[9] = c9;
+
+    // Initialize first responders positions
+    f0.r = 10; f0.c = 9;
+    f1.r = 13; f1.c = 5;
+    f2.r = 3; f2.c = 5;
+    f3.r = 7; f3.c = 0;
+    f4.r = 1; f4.c = 11;
+    f_position[0] = f0;
+    f_position[1] = f1;
+    f_position[2] = f2;
+    f_position[3] = f3;
+    f_position[4] = f4;
+
+}
+// &lt;---- END SYSTEM 3 ----&gt;
+*/
+
+// ---- MOVEMENT ----
+// Directions
+const int UP = 0;
+const int RIGHT = 1;
+const int DOWN = 2;
+const int LEFT = 3;
+const int STAY = 4; // Only for first-responder
+
+// Check if the position is within the map
+bool isInsideMap(int row, int col) {
+    return row &gt;= 0 &amp;&amp; row &lt; N_ROW &amp;&amp; col &gt;= 0 &amp;&amp; col &lt; N_COL;
+}
+
+bool isPositionFree(int row, int col){
+    if (map[row][col] == FREE)
+        return true;
+    return false;
+}
+
+// Checks if the cell in the provided direction from the current_position is free and within bounds
+bool canMove(int direction, position current_position) {
+    int new_r;
+    int new_c;
+
+    if (direction == STAY)
+        return true;
+
+    new_r = current_position.r;
+    new_c = current_position.c;
+
+    // Calculate new position based on direction
+    if (direction == UP) new_r--;
+    else if (direction == RIGHT) new_c++;
+    else if (direction == DOWN) new_r++;
+    else if (direction == LEFT) new_c--;
+
+    // Check if new position is within grid bounds and empty
+    if (!isInsideMap(new_r, new_c) || map[new_r][new_c] != 0) 
+        return false;
+    
+    // Check if the map is free in the new cell
+    if(!isPositionFree(new_r, new_c))
+        return false;
+
+    return true;
+}
+
+// Returns a new position given an old_position and a direction
+// No need to check if the new position is within bounds or free, since the canMove function is called before this function
+position getNewPosition(int direction, position old_position) {
+    position new_position;
+    int new_r = old_position.r;
+    int new_c = old_position.c;
+
+    // Calculate new position based on direction
+    if (direction == UP) new_r--;
+    else if (direction == RIGHT) new_c++;
+    else if (direction == DOWN) new_r++;
+    else if (direction == LEFT) new_c--;
+
+    new_position.r = new_r;
+    new_position.c = new_c;
+
+    return new_position;
+}
+
+// Updates the content of a cell in the map
+void updateMap(int value, position cell){
+    map[cell.r][cell.c] = value;
+}
+
+// Move the entity in the map
+void move(int direction, int entity_id, int entity_type) {
+    position current_position;
+    position new_position;
+
+    if (entity_type == FIRST_RESPONDER) {
+        // First-responder
+        if (direction == STAY)
+            return;
+
+        current_position = f_position[entity_id];
+        if (map[current_position.r][current_position.c] == CONTACTED_FIRST_RESPONDER)
+            entity_type = CONTACTED_FIRST_RESPONDER;
+        else if (map[current_position.r][current_position.c] == FATIGUED_FIRST_RESPONDER)
+            entity_type = FATIGUED_FIRST_RESPONDER;
+
+        new_position = getNewPosition(direction, current_position);
+        f_position[entity_id] = new_position;
+
+    } else if (entity_type == CIVILIAN) {
+        // Civilian
+        current_position = c_position[entity_id];
+        new_position = getNewPosition(direction, current_position);
+        c_position[entity_id] = new_position;
+    }
+    
+    updateMap(FREE, current_position);
+    updateMap(entity_type, new_position);
+}
+
+// Calculates Manhattan distance between 2 cells
+int getDistance(position pos1, position pos2) {
+    int dr = pos1.r - pos2.r;
+    int dc = pos1.c - pos2.c;
+    return (dr &gt; 0 ? dr : -dr) + (dc &gt; 0 ? dc : -dc);
+}
+
+// Gets distance between 2 civilians indipendent of their states
+int getDistanceCC(int c1_id, int c2_id) {
+    position position_c1 = c_position[c1_id];
+    position position_c2 = c_position[c2_id];
+    return getDistance(position_c1, position_c2);
+}
+
+// Gets distance between a civilian and a first-responder indipendent of their states
+int getDistanceCF(int c_id, int fr_id) {
+    position position_c = c_position[c_id];
+    position position_fr = f_position[fr_id];
+    return getDistance(position_c, position_fr);
+}
+
+// Change state of entity on the map
+void changeStateTo(int entity_id, int entity_type, int new_state) {
+    position current_position;
+    if (entity_type == CIVILIAN) {
+        current_position = c_position[entity_id];
+        // If civialian is dead or safe, remove it from the c_position array
+        if (new_state == 0) {
+            position temp = {-1, -1};
+            c_position[entity_id] = temp;
+        }
+    } else if (entity_type == FIRST_RESPONDER) {
+        current_position = f_position[entity_id];
+    }
+
+    updateMap(new_state, current_position);
+}
+
+// Find civilian id from its position
+int findCivilianIdFromPos(int row, int col) {
+    int i;
+    for (i = 0; i &lt; N_CIVILIAN; i++)
+        if (c_position[i].r == row &amp;&amp; c_position[i].c == col)
+            return i;
+    return -1;
+}
+
+// Find first-responder id from its position
+int findFirstResponderIdFromPos(int row, int col) {
+    int i;
+    for (i = 0; i &lt; N_FIRST_RESPONDER; i++)
+        if (f_position[i].r == row &amp;&amp; f_position[i].c == col)
+            return i;
+    return -1;
+}
+
+// ---- TERMINATION ----
+int drone_battery_drain[N_DRONE];
+int first_responder_fatigue[N_FIRST_RESPONDER];
+int civilian_fatigue[N_CIVILIAN];
+int available_rescue_entities = N_DRONE + N_FIRST_RESPONDER;
+
+int max_drone_battery_drain = 5;
+int max_first_responder_fatigue = 5;
+int max_civilian_fatigue = 5;
+
+void dEnergyUsed(int id) {
+    drone_battery_drain[id]++;
+}
+void fEnergyUsed(int id) {
+    first_responder_fatigue[id]++;
+    if (first_responder_fatigue[id] &gt;= max_first_responder_fatigue)
+        changeStateTo(id, FIRST_RESPONDER, FATIGUED_FIRST_RESPONDER);
+}
+void cEnergyUsed(int id) {
+    civilian_fatigue[id]++;
+    if (civilian_fatigue[id] &gt;= max_civilian_fatigue)
+        changeStateTo(id, CIVILIAN, EXHAUSTED_CIVILIAN);
+}
+
+bool isEnergyDrained(int id) {
+    return drone_battery_drain[id] &gt;= max_drone_battery_drain;
+}
+
+bool isRescueOver() {
+    return available_rescue_entities == 0;
+}
+
+// ---- COMMUNICATION ----
+// Channel declaration
+broadcast chan initialization_completed;
+broadcast chan drone_msg_start[N_CIVILIAN];
+broadcast chan civilian_noncompliance_msg[N_DRONE];
+broadcast chan drone_msg_zero_responder[N_CIVILIAN];
+broadcast chan drone_msg_contact_first_responder[N_CIVILIAN];
+broadcast chan rescue_msg[N_CIVILIAN];
+broadcast chan rescue_completed_msg[N_CIVILIAN];
+broadcast chan casualty_msg[N_CIVILIAN];
+broadcast chan civilian_contact_msg[N_FIRST_RESPONDER];
+
+// Single message communication drone -&gt; civilian zero-responder
+// Single message communication drone -&gt; civilian
+typedef struct {
+    int target_id;
+    // Implicit recipient_id
+} msg_single;
+typedef struct {
+    msg_single message;
+} inbox_single;
+struct {
+    inbox_single inboxes[N_CIVILIAN];
+} global_drone_comm_zero_responder;
+struct {
+    inbox_single inboxes[N_CIVILIAN];
+} global_drone_comm_civilian;
+
+void sendMessageSingle(int target_id, int recipient_id, bool known_compliance) {
+    msg_single new_message = {target_id};
+    if (known_compliance)
+        // Civilian zero-responder
+        global_drone_comm_zero_responder.inboxes[recipient_id].message = new_message;
+    else
+        // Civilian
+        global_drone_comm_civilian.inboxes[recipient_id].message = new_message;
+}
+int readMessageSingle(int recipient_id, bool known_compliance) {
+    msg_single empty_message = {-1};
+
+    if (known_compliance) {
+        // Civilian zero-responder
+        msg_single recipient_message = global_drone_comm_zero_responder.inboxes[recipient_id].message;
+        global_drone_comm_zero_responder.inboxes[recipient_id].message = empty_message;
+        return recipient_message.target_id;
+    } else {
+        // Civilian
+        msg_single recipient_message = global_drone_comm_civilian.inboxes[recipient_id].message;
+        global_drone_comm_civilian.inboxes[recipient_id].message = empty_message;
+        return recipient_message.target_id;
+    }
+}
+
+// Double message communication drone -&gt; civilian contacting
+// Double message communication civilian contacting -&gt; first-responder
+typedef struct {
+    int victim_id;
+    int target_id;
+    // Implicit recipient_id
+} msg_double;
+typedef struct {
+    msg_double message;
+} inbox_double;
+struct {
+    inbox_double inboxes[N_CIVILIAN];
+} global_drone_comm_civilian_contacting;
+struct {
+    inbox_double inboxes[N_FIRST_RESPONDER];
+} global_civilian_contacting_comm_first_responder;
+
+void sendMessageDouble(int victim_id, int target_id, int recipient_id, int recipient_type) {
+    msg_double new_message = {victim_id, target_id};
+    if (recipient_type == CIVILIAN)
+        // Civilian
+        global_drone_comm_civilian_contacting.inboxes[recipient_id].message = new_message;
+    else
+        // First-responder
+        global_civilian_contacting_comm_first_responder.inboxes[recipient_id].message = new_message;
+}
+msg_double readMessageDouble(int recipient_id, int recipient_type) {
+    msg_double empty_message = {-1, -1};
+
+    if (recipient_type == CIVILIAN) {
+        // Civilian
+        msg_double recipient_message = global_drone_comm_civilian_contacting.inboxes[recipient_id].message;
+        global_drone_comm_civilian_contacting.inboxes[recipient_id].message = empty_message;
+        return recipient_message;
+    } else {
+        // First-responder
+        msg_double recipient_message = global_civilian_contacting_comm_first_responder.inboxes[recipient_id].message;
+        global_civilian_contacting_comm_first_responder.inboxes[recipient_id].message = empty_message;
+        return recipient_message;
+    }
+}
+
+// Initializes the global communication inboxes
+void initializeGlobalCommunication()  {
+    msg_single empty_message_single = {-1};
+    msg_double empty_message_double = {-1,-1};
+    for (i : int[0,N_CIVILIAN - 1])
+        global_drone_comm_zero_responder.inboxes[i].message = empty_message_single;
+    for (i : int[0,N_CIVILIAN - 1])
+        global_drone_comm_civilian.inboxes[i].message = empty_message_single;
+    for (i : int[0,N_CIVILIAN - 1])
+        global_drone_comm_civilian_contacting.inboxes[i].message = empty_message_double;    
+    for (i : int[0,N_FIRST_RESPONDER - 1])
+        global_civilian_contacting_comm_first_responder.inboxes[i].message = empty_message_double;
+}
+
+
+// ---- FOR QUERIES ----
+clock global_time;
+
+int exponentialRate = 2;
+
+// Property 1 and 2
+int n_safe; // Number of safe civilians
+int n_casualty; // Number of casualties
+int n_missing; // Number of missing civilians
+
+int t_scs = 10;
+
+int percentage = 25; // N% written as a whole (e.g. 10 = 10%)
+int n_percentage; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
+
+void initializeQueries(){
+     n_percentage = (N_CIVILIAN * percentage * 10 + 500) / 1000;
+}
+
+// Checks if the positions of the civilians are different
+bool areDifferent(){
+    int i,j;
+    // Check civilian positions
+    for (i = 0; i &lt; N_CIVILIAN - 1; i++)
+        if (c_position[i].r != -1 || c_position[i].c != -1)
+            for (j = i + 1; j &lt; N_CIVILIAN; j++)
+                if ((c_position[j].r != -1 || c_position[j].c != -1) &amp;&amp; c_position[i].r == c_position[j].r &amp;&amp; c_position[i].c == c_position[j].c)
+                    return false;
+
+    // Check first responder positions
+    for (i = 0; i &lt; N_FIRST_RESPONDER - 1; i++)
+        for (j = i + 1; j &lt; N_FIRST_RESPONDER; j++)
+            if (f_position[i].r == f_position[j].r &amp;&amp; f_position[i].c == f_position[j].c)
+                return false;
+
+    // Check if any non-(-1, -1) civilian position matches any first responder position
+    for (i = 0; i &lt; N_CIVILIAN; i++)
+        if (c_position[i].r != -1 || c_position[i].c != -1)
+            for (j = 0; j &lt; N_FIRST_RESPONDER; j++)
+                if (c_position[i].r == f_position[j].r &amp;&amp; c_position[i].c == f_position[j].c)
+                    return false;
+
+    return true;
+}</declaration>
+	<template>
+		<name>Initializer</name>
+		<declaration>void initialization() {
+    initializePositions();
+    initializeGlobalCommunication();
+    initializeQueries();
+}</declaration>
+		<location id="id0" x="-561" y="-68">
+			<name x="-603" y="-102">Start</name>
+			<committed/>
+		</location>
+		<location id="id1" x="-272" y="-68">
+			<name x="-282" y="-102">Initialized</name>
+			<label kind="exponentialrate" x="-280" y="-51">exponentialRate</label>
+		</location>
+		<init ref="id0"/>
+		<transition id="id2">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-527" y="-102">initialization_completed!</label>
+			<label kind="assignment" x="-527" y="-119">initialization()</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Drone</name>
+		<parameter>const int drone_id, const int nv, const int pfail</parameter>
+		<declaration>// ---- Private drone's variables ----
+int detected_survivor_id = -1;
+int detected_victim_id = -1;
+int detected_first_responder_id = -1;
+int direction = 1; // Current movement direction of the drone (1 = DOWN, -1 = UP)
+
+// ---- Private drone's funtions ----
+// Drone moving policy
+void move() { 
+    position current_position = d_position[drone_id];
+    
+    // If drone at the top or bottom of the grid change direction, taking into account drone's nv
+    if (current_position.r == N_ROW - 1 - nv)
+        direction = -1;  
+    else if (current_position.r == nv)
+        direction = 1;
+
+    d_position[drone_id].r = d_position[drone_id].r + direction;
+}
+
+// Check if there are a survivor, a victim, a first responder within nv-cell range
+// If there is more than one civilian / victim / first responder, detect only the closest one
+void scanArea() {
+    position current_position = d_position[drone_id];
+
+    int detected_survivor_distance = 2*nv + 1;
+    int detected_victim_distance = 2*nv + 1;
+    int detected_first_responder_distance = 2*nv + 1;
+    
+    int row, col;
+
+    // Check square radius nv cells
+    for (row = current_position.r - nv; row &lt;= current_position.r + nv; row++) {
+        for (col = current_position.c - nv; col &lt;= current_position.c + nv; col++) {
+            if (isInsideMap(row, col)) {
+                position cell_position;
+                int distance;
+                cell_position.r = row;
+                cell_position.c = col;
+                distance = getDistance(current_position, cell_position);
+
+                if (map[row][col] == CIVILIAN) {
+                    int temp_civlian_id = findCivilianIdFromPos(row, col);
+                    if (temp_civlian_id != -1)
+                        if (distance &lt; detected_survivor_distance) {
+                            detected_survivor_id = temp_civlian_id;
+                            detected_survivor_distance = distance;
+                        }
+                }
+                else if (map[row][col] == VICTIM) {
+                    int temp_victim_id = findCivilianIdFromPos(row, col);
+                    if (temp_victim_id != -1)
+                        // Drone cannot assess victim's tv like a first responder
+                        if (distance &lt; detected_victim_distance) {
+                            detected_victim_id = temp_victim_id;
+                            detected_victim_distance = distance;
+                        }
+                }
+                else if (map[row][col] == FIRST_RESPONDER) {
+                    int temp_first_responder_id = findFirstResponderIdFromPos(row, col);
+                    if (temp_first_responder_id != -1)
+                        if (distance &lt; detected_first_responder_distance) {
+                            detected_first_responder_id = temp_first_responder_id;
+                            detected_first_responder_distance = distance;
+                        }
+                }
+            }
+        }
+    }
+}
+
+bool foundCivilianAndVictim() {
+    if (detected_survivor_id != -1 &amp;&amp; detected_victim_id != -1)
+        return true;
+    return false;
+}
+
+bool foundFirstResponder() {
+    return detected_first_responder_id != -1;
+}
+
+void prepareNewContact() {
+    detected_survivor_id = -1;
+    detected_victim_id = -1;
+    detected_first_responder_id = -1;
+}</declaration>
+		<location id="id3" x="-2167" y="-1521">
+		</location>
+		<location id="id4" x="-1895" y="-1521">
+			<name x="-1878" y="-1547">Idle</name>
+			<label kind="exponentialrate" x="-1887" y="-1513">exponentialRate</label>
+		</location>
+		<location id="id5" x="-977" y="-1521">
+			<committed/>
+		</location>
+		<location id="id6" x="-977" y="-1717">
+			<name x="-1105" y="-1742">Communicating</name>
+			<committed/>
+		</location>
+		<location id="id7" x="-977" y="-1360">
+			<name x="-960" y="-1385">Patrolling</name>
+			<committed/>
+		</location>
+		<location id="id8" x="-1895" y="-1717">
+			<committed/>
+		</location>
+		<location id="id9" x="-2167" y="-1360">
+			<name x="-2218" y="-1394">EnergyDrained</name>
+			<label kind="exponentialrate" x="-2218" y="-1343">exponentialRate</label>
+		</location>
+		<branchpoint id="id10" x="-977" y="-1598"/>
+		<init ref="id3"/>
+		<transition id="id11">
+			<source ref="id6"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-892" y="-1742">civilian_noncompliance_msg[drone_id]?</label>
+			<nail x="-459" y="-1717"/>
+			<nail x="-459" y="-1360"/>
+		</transition>
+		<transition id="id12">
+			<source ref="id10"/>
+			<target ref="id7"/>
+			<label kind="probability" x="-697" y="-1606">pfail</label>
+			<nail x="-705" y="-1598"/>
+			<nail x="-705" y="-1360"/>
+		</transition>
+		<transition id="id13">
+			<source ref="id10"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-960" y="-1666">drone_msg_start[detected_survivor_id]!</label>
+			<label kind="assignment" x="-960" y="-1649">sendMessageSingle(drone_id,detected_survivor_id,false)</label>
+			<label kind="probability" x="-960" y="-1683">100 - pfail</label>
+		</transition>
+		<transition id="id14">
+			<source ref="id4"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-2176" y="-1470">isEnergyDrained(drone_id)</label>
+			<label kind="assignment" x="-2193" y="-1453">available_rescue_entities--</label>
+			<nail x="-1955" y="-1470"/>
+			<nail x="-1955" y="-1360"/>
+		</transition>
+		<transition id="id15">
+			<source ref="id8"/>
+			<target ref="id4"/>
+			<label kind="assignment" x="-2082" y="-1640">prepareNewContact(),
+dEnergyUsed(drone_id)</label>
+		</transition>
+		<transition id="id16">
+			<source ref="id6"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-1547" y="-1861">!foundFirstResponder()</label>
+			<label kind="synchronisation" x="-1649" y="-1844">drone_msg_zero_responder[detected_survivor_id]!</label>
+			<label kind="assignment" x="-1725" y="-1827">sendMessageSingle(detected_victim_id,detected_survivor_id,true)</label>
+			<nail x="-977" y="-1870"/>
+			<nail x="-1895" y="-1870"/>
+		</transition>
+		<transition id="id17">
+			<source ref="id6"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-1539" y="-1708">foundFirstResponder()</label>
+			<label kind="synchronisation" x="-1700" y="-1691">drone_msg_contact_first_responder[detected_survivor_id]!</label>
+			<label kind="assignment" x="-1861" y="-1666">sendMessageDouble(detected_victim_id,detected_first_responder_id,detected_survivor_id,CIVILIAN),
+changeStateTo(detected_first_responder_id,FIRST_RESPONDER,CONTACTED_FIRST_RESPONDER)</label>
+		</transition>
+		<transition id="id18">
+			<source ref="id7"/>
+			<target ref="id4"/>
+			<label kind="assignment" x="-1649" y="-1385">move(),prepareNewContact(),dEnergyUsed(drone_id)</label>
+			<nail x="-1895" y="-1360"/>
+		</transition>
+		<transition id="id19">
+			<source ref="id5"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-960" y="-1453">!foundCivilianAndVictim()</label>
+		</transition>
+		<transition id="id20">
+			<source ref="id5"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-960" y="-1572">foundCivilianAndVictim()</label>
+		</transition>
+		<transition id="id21">
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-1623" y="-1547">!isEnergyDrained(drone_id)</label>
+			<label kind="assignment" x="-1385" y="-1547">scanArea()</label>
+		</transition>
+		<transition id="id22">
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-2142" y="-1547">initialization_completed?</label>
+		</transition>
+	</template>
+	<template>
+		<name>FirstResponder</name>
+		<parameter>const int first_responder_id, const int tfr</parameter>
+		<declaration>// ---- Private First-Responder's variables ----
+clock x;
+int detected_victim_id = -1;
+int contacting_survivor_id = -1;
+
+// ---- Private First-Responder's functions ----
+// Checks if there is a victim or an exhausted civilian within a 1-cell range to save
+// If there is more than one civilian save the one with largest tv
+void detectVictim() {
+    position current_position = f_position[first_responder_id];
+    int detected_victim_tv = -1;
+    int row, col;
+    
+    // Check square radius 1 cell
+    for (row = current_position.r - 1; row &lt;= current_position.r + 1; row++)
+        for (col = current_position.c - 1; col &lt;= current_position.c + 1; col++)
+            if (isInsideMap(row, col) &amp;&amp; (map[row][col] == VICTIM || map[row][col] == EXHAUSTED_CIVILIAN)) {
+                int temp_victim_id = findCivilianIdFromPos(row, col);
+                int temp_victim_tv = -1;
+
+                if (temp_victim_id != -1) {
+                    temp_victim_tv = civilian_tvs[temp_victim_id];
+                    // Select the civilian with greatest tv
+                    if (temp_victim_tv &gt; detected_victim_tv) {
+                        detected_victim_id = temp_victim_id;
+                        detected_victim_tv = temp_victim_tv;
+                    }
+                }
+            }    
+}
+
+// Check if first-responder is not being contacted &amp;&amp; not fatigued
+bool amFirstResponder() {
+    position current_position = f_position[first_responder_id];
+    return map[current_position.r][current_position.c] == FIRST_RESPONDER;
+}
+
+bool amFatigued() {
+    position current_position = f_position[first_responder_id];
+    return map[current_position.r][current_position.c] == FATIGUED_FIRST_RESPONDER;
+}
+
+bool foundVictim() {
+    if (detected_victim_id != -1)
+        return true;
+    return false;
+}
+
+void prepareNewRescue() {
+    detected_victim_id = -1;
+    contacting_survivor_id = -1;
+}
+
+void readMessageFromContactingCivilian() {
+    msg_double message;
+    message = readMessageDouble(first_responder_id, FIRST_RESPONDER);
+    detected_victim_id = message.victim_id;
+    contacting_survivor_id = message.target_id;
+}</declaration>
+		<location id="id23" x="-1997" y="-1700">
+		</location>
+		<location id="id24" x="-952" y="-1606">
+			<committed/>
+		</location>
+		<location id="id25" x="-1300" y="-1606">
+			<name x="-1351" y="-1598">Idle</name>
+			<label kind="exponentialrate" x="-1292" y="-1589">exponentialRate</label>
+		</location>
+		<location id="id26" x="-153" y="-1606">
+			<name x="-136" y="-1631">Assisting</name>
+			<label kind="invariant" x="-189" y="-1589">x &lt;= tfr</label>
+		</location>
+		<location id="id27" x="-1998" y="-1606">
+			<committed/>
+		</location>
+		<location id="id28" x="-1998" y="-1444">
+			<name x="-2159" y="-1462">AssistingContact</name>
+			<label kind="invariant" x="-1981" y="-1436">x &lt;= tfr
++ getDistanceCF(detected_victim_id,first_responder_id)</label>
+		</location>
+		<location id="id29" x="-1997" y="-1020">
+			<label kind="invariant" x="-1988" y="-1003">x &lt;= tfr
++ getDistanceCF(detected_victim_id, first_responder_id)</label>
+		</location>
+		<location id="id30" x="-1734" y="-1249">
+			<committed/>
+		</location>
+		<location id="id31" x="-952" y="-1462">
+			<name x="-935" y="-1487">Wandering</name>
+			<label kind="exponentialrate" x="-1096" y="-1496">exponentialRate</label>
+		</location>
+		<location id="id32" x="-1300" y="-1249">
+			<committed/>
+		</location>
+		<location id="id33" x="-1368" y="-1870">
+			<name x="-1402" y="-1904">Fatigued</name>
+			<label kind="exponentialrate" x="-1360" y="-1853">exponentialRate</label>
+		</location>
+		<location id="id34" x="-926" y="-1768">
+			<committed/>
+		</location>
+		<init ref="id23"/>
+		<transition id="id35">
+			<source ref="id34"/>
+			<target ref="id25"/>
+			<label kind="assignment" x="-1300" y="-1793">prepareNewRescue()</label>
+			<nail x="-1300" y="-1768"/>
+		</transition>
+		<transition id="id36">
+			<source ref="id25"/>
+			<target ref="id33"/>
+			<label kind="guard" x="-1487" y="-1836">amFatigued()</label>
+			<label kind="assignment" x="-1615" y="-1819">available_rescue_entities--</label>
+			<nail x="-1368" y="-1700"/>
+		</transition>
+		<transition id="id37">
+			<source ref="id32"/>
+			<target ref="id25"/>
+			<label kind="assignment" x="-1283" y="-1334">changeStateTo(first_responder_id,FIRST_RESPONDER,FIRST_RESPONDER),
+prepareNewRescue(),
+fEnergyUsed(first_responder_id)</label>
+		</transition>
+		<transition id="id38">
+			<source ref="id27"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-1980" y="-1538">rescue_msg[detected_victim_id]!</label>
+			<label kind="assignment" x="-1980" y="-1521">x = 0</label>
+		</transition>
+		<transition id="id39">
+			<source ref="id24"/>
+			<target ref="id31"/>
+			<label kind="guard" x="-943" y="-1547">!foundVictim()</label>
+		</transition>
+		<transition id="id40">
+			<source ref="id28"/>
+			<target ref="id30"/>
+			<label kind="guard" x="-1980" y="-1334">x &gt;= tfr
++ getDistanceCF(detected_victim_id,first_responder_id)</label>
+			<label kind="synchronisation" x="-1981" y="-1292">rescue_completed_msg[detected_victim_id]!</label>
+			<nail x="-1998" y="-1249"/>
+		</transition>
+		<transition id="id41">
+			<source ref="id30"/>
+			<target ref="id32"/>
+			<label kind="synchronisation" x="-1708" y="-1241">rescue_completed_msg[contacting_survivor_id]!</label>
+		</transition>
+		<transition id="id42">
+			<source ref="id31"/>
+			<target ref="id25"/>
+			<label kind="select" x="-1283" y="-1453">direction : int[0,4]</label>
+			<label kind="guard" x="-1283" y="-1436">canMove(direction,f_position[first_responder_id])</label>
+			<label kind="assignment" x="-1283" y="-1419">move(direction,first_responder_id,FIRST_RESPONDER)</label>
+			<nail x="-1300" y="-1462"/>
+		</transition>
+		<transition id="id43">
+			<source ref="id29"/>
+			<target ref="id32"/>
+			<label kind="guard" x="-1283" y="-1164">x &gt;= tfr
++ getDistanceCF(detected_victim_id,first_responder_id)</label>
+			<label kind="synchronisation" x="-1283" y="-1122">rescue_completed_msg[contacting_survivor_id]!</label>
+			<nail x="-1299" y="-1020"/>
+		</transition>
+		<transition id="id44">
+			<source ref="id28"/>
+			<target ref="id29"/>
+			<label kind="guard" x="-1980" y="-1164">x &lt; tfr
++ getDistanceCF(detected_victim_id,first_responder_id)</label>
+			<label kind="synchronisation" x="-1980" y="-1121">casualty_msg[detected_victim_id]?</label>
+		</transition>
+		<transition id="id45">
+			<source ref="id25"/>
+			<target ref="id27"/>
+			<label kind="synchronisation" x="-1836" y="-1598">civilian_contact_msg[first_responder_id]?</label>
+			<label kind="assignment" x="-1810" y="-1581">readMessageFromContactingCivilian()</label>
+		</transition>
+		<transition id="id46">
+			<source ref="id24"/>
+			<target ref="id26"/>
+			<label kind="guard" x="-875" y="-1666">foundVictim()</label>
+			<label kind="synchronisation" x="-875" y="-1649">rescue_msg[detected_victim_id]!</label>
+			<label kind="assignment" x="-875" y="-1632">x = 0</label>
+		</transition>
+		<transition id="id47">
+			<source ref="id26"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="-450" y="-1793">casualty_msg[detected_victim_id]?</label>
+			<nail x="-153" y="-1768"/>
+		</transition>
+		<transition id="id48">
+			<source ref="id26"/>
+			<target ref="id34"/>
+			<label kind="guard" x="-238" y="-1717">x &gt;= tfr</label>
+			<label kind="synchronisation" x="-527" y="-1700">rescue_completed_msg[detected_victim_id]!</label>
+			<nail x="-153" y="-1725"/>
+			<nail x="-926" y="-1725"/>
+		</transition>
+		<transition id="id49">
+			<source ref="id25"/>
+			<target ref="id24"/>
+			<label kind="guard" x="-1249" y="-1674">amFirstResponder()</label>
+			<label kind="assignment" x="-1249" y="-1657">detectVictim(),
+fEnergyUsed(first_responder_id)</label>
+		</transition>
+		<transition id="id50">
+			<source ref="id23"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-1972" y="-1751">initialization_completed?</label>
+			<label kind="assignment" x="-1972" y="-1734">updateMap(FIRST_RESPONDER,f_position[first_responder_id])</label>
+			<nail x="-1445" y="-1700"/>
+		</transition>
+	</template>
+	<template>
+		<name>Civilian</name>
+		<parameter>const int civilian_id, const int tv, const int tzr, const int plisten</parameter>
+		<declaration>// ---- Private Civilian's variables ----
+clock x;
+int comm_drone_id = -1;
+int comm_victim_id = -1;
+int comm_first_responder_id = -1;
+
+// ---- Private Civilian's variables ----
+// Checks if there is an entity of "type" in the "radius"
+bool checkNeighbor(int type){
+    position current_position = c_position[civilian_id];
+    int row, col;
+    
+    // Check square radius 1 cell
+    for (row = current_position.r - 1; row &lt;= current_position.r + 1; row++)
+        for (col = current_position.c - 1; col &lt;= current_position.c + 1; col++)
+            if (isInsideMap(row, col) &amp;&amp; map[row][col] == type)
+                return true;
+
+    return false;
+}
+
+// Check if the civilian is near an exit
+bool amSafe() {
+    return checkNeighbor(EXIT);
+}
+
+// Check if the civilian is near a fire
+bool amVictim() {
+    return checkNeighbor(FIRE);
+}
+
+bool amExhausted() {
+    position current_position = c_position[civilian_id];
+    return map[current_position.r][current_position.c] == EXHAUSTED_CIVILIAN;
+}
+
+void changeStateCivilian(int new_state) {
+
+    if (new_state == SAFE) {
+        n_safe++;
+        new_state = 0;
+    } else if (new_state == CASUALTY) {
+        n_casualty++;
+        new_state = 0;
+    }
+
+    changeStateTo(civilian_id, CIVILIAN, new_state);
+}
+
+void readDoubleMessageFromDrone() {
+    msg_double message;
+    message = readMessageDouble(civilian_id, CIVILIAN);
+    comm_victim_id = message.victim_id;
+    comm_first_responder_id = message.target_id;
+}
+
+bool isCommVictimStillVictim() {
+    position target_position = c_position[comm_victim_id];
+    if (target_position.c == -1 &amp;&amp; target_position.r == -1)
+        return false;
+    return map[target_position.r][target_position.c] == VICTIM;
+}
+
+void prepareNewCommunication() {
+    changeStateTo(comm_first_responder_id,FIRST_RESPONDER,FIRST_RESPONDER);
+    comm_drone_id = -1;
+    comm_victim_id = -1;
+    comm_first_responder_id = -1;
+}</declaration>
+		<location id="id51" x="-3102" y="-1989">
+		</location>
+		<location id="id52" x="-2694" y="-1989">
+			<committed/>
+		</location>
+		<location id="id53" x="-2694" y="-2150">
+			<name x="-2745" y="-2176">Safe</name>
+			<label kind="exponentialrate" x="-2830" y="-2142">exponentialRate</label>
+		</location>
+		<location id="id54" x="-1979" y="-1989">
+			<committed/>
+		</location>
+		<location id="id55" x="-1979" y="-2150">
+			<name x="-1963" y="-2176">Victim</name>
+			<label kind="invariant" x="-1963" y="-2142">x &lt;= tv</label>
+		</location>
+		<location id="id56" x="-722" y="-1989">
+			<committed/>
+		</location>
+		<location id="id57" x="-1980" y="-2303">
+			<name x="-2014" y="-2337">Casualty</name>
+			<label kind="exponentialrate" x="-1963" y="-2295">exponentialRate</label>
+		</location>
+		<location id="id58" x="-2337" y="-2150">
+			<name x="-2388" y="-2133">InAssistance</name>
+			<label kind="invariant" x="-2362" y="-2116">x &lt;= tv</label>
+		</location>
+		<location id="id59" x="-1122" y="-2201">
+			<committed/>
+		</location>
+		<location id="id60" x="-1122" y="-2363">
+			<name x="-1104" y="-2388">ZeroResponder</name>
+			<label kind="invariant" x="-1105" y="-2354">x &lt;= tzr + getDistanceCC(civilian_id,comm_victim_id)</label>
+		</location>
+		<location id="id61" x="-1121" y="-2618">
+			<label kind="invariant" x="-1104" y="-2618">x &lt;= tzr + getDistanceCC(civilian_id,comm_victim_id)</label>
+		</location>
+		<location id="id62" x="-331" y="-2677">
+			<name x="-314" y="-2703">Contacting</name>
+			<label kind="exponentialrate" x="-306" y="-2669">exponentialRate</label>
+		</location>
+		<location id="id63" x="-332" y="-2201">
+			<name x="-433" y="-2227">GoingToFr</name>
+			<label kind="invariant" x="-833" y="-2201">x &lt;= getDistanceCF(civilian_id,comm_first_responder_id)</label>
+		</location>
+		<location id="id64" x="-1436" y="-1989">
+			<name x="-1453" y="-2023">Idle</name>
+			<label kind="exponentialrate" x="-1572" y="-1980">exponentialRate</label>
+		</location>
+		<location id="id65" x="-332" y="-2363">
+			<name x="-450" y="-2397">WaitingForFr</name>
+			<label kind="exponentialrate" x="-476" y="-2354">exponentialRate</label>
+		</location>
+		<location id="id66" x="-1343" y="-2150">
+			<name x="-1326" y="-2176">Exhausted</name>
+			<label kind="exponentialrate" x="-1496" y="-2142">exponentialRate</label>
+		</location>
+		<location id="id67" x="-1343" y="-2295">
+			<name x="-1368" y="-2329">Missing</name>
+			<label kind="exponentialrate" x="-1334" y="-2286">exponentialRate</label>
+		</location>
+		<location id="id68" x="-50" y="-1853">
+			<committed/>
+		</location>
+		<location id="id69" x="-1657" y="-2295">
+			<name x="-1640" y="-2329">InAssistanceEx</name>
+			<label kind="exponentialrate" x="-1649" y="-2278">exponentialRate</label>
+		</location>
+		<location id="id70" x="-1640" y="-1989">
+			<committed/>
+		</location>
+		<location id="id71" x="-884" y="-1921">
+			<committed/>
+		</location>
+		<location id="id72" x="-935" y="-1989">
+			<committed/>
+		</location>
+		<branchpoint id="id73" x="-884" y="-1989"/>
+		<init ref="id51"/>
+		<transition id="id74" controllable="false">
+			<source ref="id72"/>
+			<target ref="id73"/>
+		</transition>
+		<transition id="id75">
+			<source ref="id71"/>
+			<target ref="id64"/>
+			<label kind="synchronisation" x="-1283" y="-1963">civilian_noncompliance_msg[comm_drone_id]!</label>
+			<label kind="assignment" x="-1181" y="-1946">comm_drone_id = -1</label>
+			<nail x="-1283" y="-1921"/>
+		</transition>
+		<transition id="id76">
+			<source ref="id73"/>
+			<target ref="id71"/>
+			<label kind="probability" x="-875" y="-1963">100 - plisten</label>
+			<nail x="-884" y="-1963"/>
+		</transition>
+		<transition id="id77">
+			<source ref="id73"/>
+			<target ref="id56"/>
+			<label kind="probability" x="-841" y="-2014">plisten</label>
+		</transition>
+		<transition id="id78">
+			<source ref="id70"/>
+			<target ref="id64"/>
+			<label kind="guard" x="-1623" y="-2014">!amExhausted()</label>
+		</transition>
+		<transition id="id79">
+			<source ref="id66"/>
+			<target ref="id69"/>
+			<label kind="synchronisation" x="-1649" y="-2193">rescue_msg[civilian_id]?</label>
+			<label kind="assignment" x="-1649" y="-2176">changeStateCivilian(IN_ASSISTANCE)</label>
+			<nail x="-1657" y="-2150"/>
+		</transition>
+		<transition id="id80">
+			<source ref="id69"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-2176" y="-2405">rescue_completed_msg[civilian_id]?</label>
+			<label kind="assignment" x="-1870" y="-2405">changeStateCivilian(SAFE)</label>
+			<nail x="-1657" y="-2380"/>
+			<nail x="-2694" y="-2380"/>
+		</transition>
+		<transition id="id81">
+			<source ref="id68"/>
+			<target ref="id70"/>
+			<label kind="assignment" x="-526" y="-1879">prepareNewCommunication(),cEnergyUsed(civilian_id)</label>
+			<nail x="-1394" y="-1853"/>
+			<nail x="-1394" y="-1938"/>
+			<nail x="-1640" y="-1938"/>
+		</transition>
+		<transition id="id82">
+			<source ref="id66"/>
+			<target ref="id67"/>
+			<label kind="guard" x="-1334" y="-2252">isRescueOver()</label>
+			<label kind="assignment" x="-1334" y="-2235">n_missing++</label>
+		</transition>
+		<transition id="id83">
+			<source ref="id70"/>
+			<target ref="id66"/>
+			<label kind="guard" x="-1632" y="-2091">amExhausted()</label>
+			<nail x="-1640" y="-2065"/>
+			<nail x="-1343" y="-2065"/>
+		</transition>
+		<transition id="id84">
+			<source ref="id65"/>
+			<target ref="id68"/>
+			<label kind="guard" x="-306" y="-2388">!isCommVictimStillVictim()</label>
+			<nail x="187" y="-2363"/>
+			<nail x="188" y="-1853"/>
+		</transition>
+		<transition id="id85">
+			<source ref="id63"/>
+			<target ref="id65"/>
+			<label kind="guard" x="-306" y="-2303">isCommVictimStillVictim() &amp;&amp;
+x &gt;= getDistanceCF(civilian_id,comm_first_responder_id)</label>
+		</transition>
+		<transition id="id86">
+			<source ref="id64"/>
+			<target ref="id72"/>
+			<label kind="synchronisation" x="-1385" y="-2031">drone_msg_start[civilian_id]?</label>
+			<label kind="assignment" x="-1385" y="-2014">comm_drone_id = readMessageSingle(civilian_id,false)</label>
+		</transition>
+		<transition id="id87">
+			<source ref="id63"/>
+			<target ref="id68"/>
+			<label kind="guard" x="-306" y="-2193">!isCommVictimStillVictim()</label>
+			<nail x="-51" y="-2201"/>
+			<nail x="-50" y="-1870"/>
+		</transition>
+		<transition id="id88">
+			<source ref="id64"/>
+			<target ref="id52"/>
+			<label kind="select" x="-1632" y="-1921">direction : int[0,3]</label>
+			<label kind="guard" x="-1980" y="-1904">canMove(direction,c_position[civilian_id]) &amp;&amp; !amExhausted()</label>
+			<label kind="assignment" x="-1989" y="-1887">move(direction,civilian_id,CIVILIAN),cEnergyUsed(civilian_id)</label>
+			<nail x="-1436" y="-1853"/>
+			<nail x="-2694" y="-1853"/>
+		</transition>
+		<transition id="id89">
+			<source ref="id62"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-900" y="-2703">rescue_completed_msg[civilian_id]?</label>
+			<label kind="assignment" x="-594" y="-2703">changeStateCivilian(SAFE)</label>
+			<nail x="-2694" y="-2677"/>
+		</transition>
+		<transition id="id90">
+			<source ref="id65"/>
+			<target ref="id62"/>
+			<label kind="guard" x="-306" y="-2558">isCommVictimStillVictim()</label>
+			<label kind="synchronisation" x="-306" y="-2541">civilian_contact_msg[comm_first_responder_id]!</label>
+			<label kind="assignment" x="-306" y="-2524">sendMessageDouble(comm_victim_id,civilian_id,
+comm_first_responder_id,FIRST_RESPONDER)</label>
+		</transition>
+		<transition id="id91">
+			<source ref="id59"/>
+			<target ref="id60"/>
+			<label kind="synchronisation" x="-1105" y="-2303">rescue_msg[comm_victim_id]!</label>
+			<label kind="assignment" x="-1105" y="-2286">x = 0</label>
+		</transition>
+		<transition id="id92">
+			<source ref="id56"/>
+			<target ref="id63"/>
+			<label kind="synchronisation" x="-688" y="-2116">drone_msg_contact_first_responder[civilian_id]?</label>
+			<label kind="assignment" x="-688" y="-2091">changeStateCivilian(IN_CONTACT),
+readDoubleMessageFromDrone(),
+x = 0</label>
+			<nail x="-705" y="-2125"/>
+			<nail x="-331" y="-2125"/>
+		</transition>
+		<transition id="id93">
+			<source ref="id61"/>
+			<target ref="id53"/>
+			<label kind="guard" x="-1589" y="-2609">x &gt;= tzr + getDistanceCC(civilian_id,comm_victim_id)</label>
+			<label kind="assignment" x="-1351" y="-2592">changeStateCivilian(SAFE)</label>
+			<nail x="-2694" y="-2618"/>
+		</transition>
+		<transition id="id94">
+			<source ref="id60"/>
+			<target ref="id61"/>
+			<label kind="guard" x="-1105" y="-2558">x &lt; tzr + getDistanceCC(civilian_id,comm_victim_id)</label>
+			<label kind="synchronisation" x="-1105" y="-2541">casualty_msg[comm_victim_id]?</label>
+		</transition>
+		<transition id="id95">
+			<source ref="id60"/>
+			<target ref="id53"/>
+			<label kind="guard" x="-1589" y="-2473">x &gt;= tzr + getDistanceCC(civilian_id,comm_victim_id)</label>
+			<label kind="synchronisation" x="-1453" y="-2456">rescue_completed_msg[comm_victim_id]!</label>
+			<label kind="assignment" x="-1351" y="-2439">changeStateCivilian(SAFE)</label>
+			<nail x="-1121" y="-2482"/>
+			<nail x="-2693" y="-2482"/>
+		</transition>
+		<transition id="id96">
+			<source ref="id56"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-1198" y="-2116">drone_msg_zero_responder[civilian_id]?</label>
+			<label kind="assignment" x="-1198" y="-2091">changeStateCivilian(ZERO_RESPONDER),
+comm_victim_id = readMessageSingle(civilian_id,true)</label>
+			<nail x="-739" y="-2125"/>
+			<nail x="-1122" y="-2125"/>
+		</transition>
+		<transition id="id97">
+			<source ref="id58"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-2660" y="-2193">rescue_completed_msg[civilian_id]?</label>
+			<label kind="assignment" x="-2660" y="-2176">changeStateCivilian(SAFE)</label>
+		</transition>
+		<transition id="id98">
+			<source ref="id58"/>
+			<target ref="id57"/>
+			<label kind="guard" x="-2328" y="-2295">x &gt;= tv</label>
+			<label kind="synchronisation" x="-2328" y="-2278">casualty_msg[civilian_id]!</label>
+			<label kind="assignment" x="-2328" y="-2261">changeStateCivilian(CASUALTY)</label>
+			<nail x="-2337" y="-2303"/>
+		</transition>
+		<transition id="id99">
+			<source ref="id55"/>
+			<target ref="id58"/>
+			<label kind="synchronisation" x="-2311" y="-2193">rescue_msg[civilian_id]?</label>
+			<label kind="assignment" x="-2311" y="-2176">changeStateCivilian(IN_ASSISTANCE)</label>
+		</transition>
+		<transition id="id100">
+			<source ref="id55"/>
+			<target ref="id57"/>
+			<label kind="guard" x="-1963" y="-2252">x &gt;= tv</label>
+			<label kind="assignment" x="-1963" y="-2235">changeStateCivilian(CASUALTY)</label>
+		</transition>
+		<transition id="id101">
+			<source ref="id54"/>
+			<target ref="id70"/>
+			<label kind="guard" x="-1963" y="-2014">!amVictim()</label>
+		</transition>
+		<transition id="id102">
+			<source ref="id54"/>
+			<target ref="id55"/>
+			<label kind="guard" x="-1971" y="-2091">amVictim()</label>
+			<label kind="assignment" x="-1971" y="-2074">changeStateCivilian(VICTIM), x = 0</label>
+		</transition>
+		<transition id="id103">
+			<source ref="id52"/>
+			<target ref="id54"/>
+			<label kind="guard" x="-2677" y="-2014">!amSafe()</label>
+		</transition>
+		<transition id="id104">
+			<source ref="id52"/>
+			<target ref="id53"/>
+			<label kind="guard" x="-2685" y="-2091">amSafe()</label>
+			<label kind="assignment" x="-2685" y="-2074">changeStateCivilian(SAFE)</label>
+		</transition>
+		<transition id="id105">
+			<source ref="id51"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="-3085" y="-2040">initialization_completed?</label>
+			<label kind="assignment" x="-3085" y="-2023">updateMap(CIVILIAN,c_position[civilian_id])</label>
+		</transition>
+	</template>
+	<system>// Templates instantiations
+initializer = Initializer();
+
+/*
+// &lt;---- SYSTEM 1 ----&gt;
+drone0 = Drone(drone_ids[0], drone_nvs[0], drone_pfails[0]);
+drone1 = Drone(drone_ids[1], drone_nvs[1], drone_pfails[1]);
+
+fr0 = FirstResponder(first_responder_ids[0], first_responder_tfrs[0]);
+fr1 = FirstResponder(first_responder_ids[1], first_responder_tfrs[1]);
+
+civ0 = Civilian(civilian_ids[0], civilian_tvs[0], civilian_tzrs[0], civilian_plistens[0]);
+civ1 = Civilian(civilian_ids[1], civilian_tvs[1], civilian_tzrs[1], civilian_plistens[1]);
+civ2 = Civilian(civilian_ids[2], civilian_tvs[2], civilian_tzrs[2], civilian_plistens[2]);
+
+system initializer, drone0, drone1, fr0, fr1, civ0, civ1, civ2;
+// &lt;---- END SYSTEM 1 ----&gt;
+
+
+*/
+// &lt;---- SYSTEM 2 ----&gt;
+drone0 = Drone(drone_ids[0], drone_nvs[0], drone_pfails[0]);
+drone1 = Drone(drone_ids[1], drone_nvs[1], drone_pfails[1]);
+
+fr0 = FirstResponder(first_responder_ids[0], first_responder_tfrs[0]);
+fr1 = FirstResponder(first_responder_ids[1], first_responder_tfrs[1]);
+fr2 = FirstResponder(first_responder_ids[2], first_responder_tfrs[2]);
+fr3 = FirstResponder(first_responder_ids[3], first_responder_tfrs[3]);
+fr4 = FirstResponder(first_responder_ids[4], first_responder_tfrs[4]);
+
+civ0 = Civilian(civilian_ids[0], civilian_tvs[0], civilian_tzrs[0], civilian_plistens[0]);
+civ1 = Civilian(civilian_ids[1], civilian_tvs[1], civilian_tzrs[1], civilian_plistens[1]);
+civ2 = Civilian(civilian_ids[2], civilian_tvs[2], civilian_tzrs[2], civilian_plistens[2]);
+civ3 = Civilian(civilian_ids[3], civilian_tvs[3], civilian_tzrs[3], civilian_plistens[3]);
+civ4 = Civilian(civilian_ids[4], civilian_tvs[4], civilian_tzrs[4], civilian_plistens[4]);
+civ5 = Civilian(civilian_ids[5], civilian_tvs[5], civilian_tzrs[5], civilian_plistens[5]);
+civ6 = Civilian(civilian_ids[6], civilian_tvs[6], civilian_tzrs[6], civilian_plistens[6]);
+civ7 = Civilian(civilian_ids[7], civilian_tvs[7], civilian_tzrs[7], civilian_plistens[7]);
+civ8 = Civilian(civilian_ids[8], civilian_tvs[8], civilian_tzrs[8], civilian_plistens[8]);
+civ9 = Civilian(civilian_ids[9], civilian_tvs[9], civilian_tzrs[9], civilian_plistens[9]);
+civ10 = Civilian(civilian_ids[10], civilian_tvs[10], civilian_tzrs[10], civilian_plistens[10]);
+
+system initializer, drone0, drone1, fr0, fr1, fr2, fr3, fr4, civ0, civ1, civ2, civ3, civ4, civ5, civ6, civ7, civ8, civ9, civ10;
+// &lt;---- END SYSTEM 2 ----&gt;
+
+
+/*
+// &lt;---- SYSTEM 3 ----&gt;
+drone0 = Drone(drone_ids[0], drone_nvs[0], drone_pfails[0]);
+drone1 = Drone(drone_ids[1], drone_nvs[1], drone_pfails[1]);
+drone2 = Drone(drone_ids[2], drone_nvs[2], drone_pfails[2]);
+drone3 = Drone(drone_ids[3], drone_nvs[3], drone_pfails[3]);
+
+fr0 = FirstResponder(first_responder_ids[0], first_responder_tfrs[0]);
+fr1 = FirstResponder(first_responder_ids[1], first_responder_tfrs[1]);
+fr2 = FirstResponder(first_responder_ids[2], first_responder_tfrs[2]);
+fr3 = FirstResponder(first_responder_ids[3], first_responder_tfrs[3]);
+fr4 = FirstResponder(first_responder_ids[4], first_responder_tfrs[4]);
+
+civ0 = Civilian(civilian_ids[0], civilian_tvs[0], civilian_tzrs[0], civilian_plistens[0]);
+civ1 = Civilian(civilian_ids[1], civilian_tvs[1], civilian_tzrs[1], civilian_plistens[1]);
+civ2 = Civilian(civilian_ids[2], civilian_tvs[2], civilian_tzrs[2], civilian_plistens[2]);
+civ3 = Civilian(civilian_ids[3], civilian_tvs[3], civilian_tzrs[3], civilian_plistens[3]);
+civ4 = Civilian(civilian_ids[4], civilian_tvs[4], civilian_tzrs[4], civilian_plistens[4]);
+civ5 = Civilian(civilian_ids[5], civilian_tvs[5], civilian_tzrs[5], civilian_plistens[5]);
+civ6 = Civilian(civilian_ids[6], civilian_tvs[6], civilian_tzrs[6], civilian_plistens[6]);
+civ7 = Civilian(civilian_ids[7], civilian_tvs[7], civilian_tzrs[7], civilian_plistens[7]);
+civ8 = Civilian(civilian_ids[8], civilian_tvs[8], civilian_tzrs[8], civilian_plistens[8]);
+civ9 = Civilian(civilian_ids[9], civilian_tvs[9], civilian_tzrs[9], civilian_plistens[9]);
+
+system initializer, drone0, drone1, drone2, drone3, fr0, fr1, fr2, fr3, fr4, civ0, civ1, civ2, civ3, civ4, civ5, civ6, civ7, civ8, civ9;
+// &lt;---- END SYSTEM 3 ----&gt;
+*/</system>
+	<queries>
+		<option key="--diagnostic" value="1"/>
+		<query>
+			<formula>E&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized </formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>A&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
+			<comment/>
+			<result outcome="failure" type="quality" timestamp="2024-07-22 00:04:55 +0200">
+				<option key="--diagnostic" value="1"/>
+			</result>
+		</query>
+		<query>
+			<formula>Pr[&lt;=2](&lt;&gt; n_safe&gt;= n_percentage &amp;&amp; initializer.Initialized)</formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>A[] (not deadlock)</formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>A[] (initializer.Start &amp;&amp; !areDifferent()) || (initializer.Initialized &amp;&amp; areDifferent())</formula>
+			<comment>Checks that the positions of the civilians and first responders are always unique.</comment>
+			<result outcome="success" type="quality" timestamp="2024-07-20 15:25:59 +0200">
+				<option key="--diagnostic" value="1"/>
+			</result>
+		</query>
+	</queries>
+</nta>
