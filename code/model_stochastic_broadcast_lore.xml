@@ -621,8 +621,7 @@ void initializeGlobalCommunication()  {
 // ---- FOR QUERIES ----
 clock global_time;
 
-int slow_rate = 1;
-int fast_rate = 10;
+int exponentialRate = 2;
 
 // Property 1 and 2
 int n_safe; // Number of safe civilians
@@ -631,7 +630,7 @@ int n_missing; // Number of missing civilians
 
 int t_scs = 10;
 
-int percentage = 100; // N% written as a whole (e.g. 10 = 10%)
+int percentage = 25; // N% written as a whole (e.g. 10 = 10%)
 int n_percentage; // N_CIVILIAN * N% with some workarounds so that we don't use doubles
 
 void initializeQueries(){
@@ -676,6 +675,7 @@ bool areDifferent(){
 		</location>
 		<location id="id1" x="-272" y="-68">
 			<name x="-282" y="-102">Initialized</name>
+			<label kind="exponentialrate" x="-280" y="-51">exponentialRate</label>
 		</location>
 		<init ref="id0"/>
 		<transition id="id2">
@@ -778,7 +778,7 @@ void prepareNewContact() {
 		</location>
 		<location id="id4" x="-1895" y="-1521">
 			<name x="-1878" y="-1547">Idle</name>
-			<label kind="exponentialrate" x="-1878" y="-1513">slow_rate</label>
+			<label kind="exponentialrate" x="-1887" y="-1513">exponentialRate</label>
 		</location>
 		<location id="id5" x="-977" y="-1521">
 			<committed/>
@@ -796,6 +796,7 @@ void prepareNewContact() {
 		</location>
 		<location id="id9" x="-2167" y="-1360">
 			<name x="-2218" y="-1394">EnergyDrained</name>
+			<label kind="exponentialrate" x="-2218" y="-1343">exponentialRate</label>
 		</location>
 		<branchpoint id="id10" x="-977" y="-1598"/>
 		<init ref="id3"/>
@@ -948,7 +949,7 @@ void readMessageFromContactingCivilian() {
 		</location>
 		<location id="id25" x="-1300" y="-1606">
 			<name x="-1351" y="-1598">Idle</name>
-			<label kind="exponentialrate" x="-1394" y="-1581">slow_rate</label>
+			<label kind="exponentialrate" x="-1292" y="-1589">exponentialRate</label>
 		</location>
 		<location id="id26" x="-153" y="-1606">
 			<name x="-136" y="-1631">Assisting</name>
@@ -971,13 +972,14 @@ void readMessageFromContactingCivilian() {
 		</location>
 		<location id="id31" x="-952" y="-1462">
 			<name x="-935" y="-1487">Wandering</name>
-			<label kind="exponentialrate" x="-935" y="-1462">fast_rate</label>
+			<label kind="exponentialrate" x="-1096" y="-1496">exponentialRate</label>
 		</location>
 		<location id="id32" x="-1300" y="-1249">
 			<committed/>
 		</location>
 		<location id="id33" x="-1368" y="-1870">
 			<name x="-1402" y="-1904">Fatigued</name>
+			<label kind="exponentialrate" x="-1360" y="-1853">exponentialRate</label>
 		</location>
 		<location id="id34" x="-926" y="-1768">
 			<committed/>
@@ -1171,6 +1173,7 @@ void prepareNewCommunication() {
 		</location>
 		<location id="id53" x="-2694" y="-2150">
 			<name x="-2745" y="-2176">Safe</name>
+			<label kind="exponentialrate" x="-2830" y="-2142">exponentialRate</label>
 		</location>
 		<location id="id54" x="-1979" y="-1989">
 			<committed/>
@@ -1184,6 +1187,7 @@ void prepareNewCommunication() {
 		</location>
 		<location id="id57" x="-1980" y="-2303">
 			<name x="-2014" y="-2337">Casualty</name>
+			<label kind="exponentialrate" x="-1963" y="-2295">exponentialRate</label>
 		</location>
 		<location id="id58" x="-2337" y="-2150">
 			<name x="-2388" y="-2133">InAssistance</name>
@@ -1201,7 +1205,7 @@ void prepareNewCommunication() {
 		</location>
 		<location id="id62" x="-331" y="-2677">
 			<name x="-314" y="-2703">Contacting</name>
-			<label kind="exponentialrate" x="-306" y="-2669">fast_rate</label>
+			<label kind="exponentialrate" x="-306" y="-2669">exponentialRate</label>
 		</location>
 		<location id="id63" x="-332" y="-2201">
 			<name x="-433" y="-2227">GoingToFr</name>
@@ -1209,25 +1213,26 @@ void prepareNewCommunication() {
 		</location>
 		<location id="id64" x="-1436" y="-1989">
 			<name x="-1453" y="-2023">Idle</name>
-			<label kind="exponentialrate" x="-1521" y="-1980">slow_rate</label>
+			<label kind="exponentialrate" x="-1572" y="-1980">exponentialRate</label>
 		</location>
 		<location id="id65" x="-332" y="-2363">
 			<name x="-450" y="-2397">WaitingForFr</name>
-			<label kind="exponentialrate" x="-425" y="-2354">fast_rate</label>
+			<label kind="exponentialrate" x="-476" y="-2354">exponentialRate</label>
 		</location>
 		<location id="id66" x="-1343" y="-2150">
 			<name x="-1326" y="-2176">Exhausted</name>
-			<label kind="exponentialrate" x="-1326" y="-2142">fast_rate</label>
+			<label kind="exponentialrate" x="-1496" y="-2142">exponentialRate</label>
 		</location>
 		<location id="id67" x="-1343" y="-2295">
 			<name x="-1368" y="-2329">Missing</name>
+			<label kind="exponentialrate" x="-1334" y="-2286">exponentialRate</label>
 		</location>
 		<location id="id68" x="-50" y="-1853">
 			<committed/>
 		</location>
 		<location id="id69" x="-1657" y="-2295">
 			<name x="-1640" y="-2329">InAssistanceEx</name>
-			<label kind="exponentialrate" x="-1640" y="-2278">fast_rate</label>
+			<label kind="exponentialrate" x="-1649" y="-2278">exponentialRate</label>
 		</location>
 		<location id="id70" x="-1640" y="-1989">
 			<committed/>
@@ -1544,10 +1549,6 @@ system initializer, drone0, drone1, drone2, drone3, fr0, fr1, fr2, fr3, fr4, civ
 		<query>
 			<formula>Pr[&lt;=100](&lt;&gt; n_safe&gt;= n_percentage &amp;&amp; initializer.Initialized)</formula>
 			<comment/>
-			<result outcome="success" type="interval" value="≤ 0.0499441 (95% CI)" timestamp="2024-07-22 19:40:48 +0200">
-				<option key="--diagnostic" value="1"/>
-				<details>≤ 0.0499441 (95% CI)</details>
-			</result>
 		</query>
 		<query>
 			<formula>A[] (initializer.Start &amp;&amp; !areDifferent()) || (initializer.Initialized &amp;&amp; areDifferent())</formula>

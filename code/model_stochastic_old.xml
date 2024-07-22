@@ -110,7 +110,7 @@ void initializePositions() {
     f_position[1] = f1;
 }
 // &lt;---- END SYSTEM 1 ----&gt;
-*/
+
 
 // &lt;---- SYSTEM 2 ----&gt;
 const int N_ROW = 20;
@@ -214,8 +214,8 @@ void initializePositions() {
 
 }
 // &lt;---- END SYSTEM 2 ----&gt;
+*/
 
-/*
 // &lt;---- SYSTEM 3 ----&gt;
 const int N_ROW = 18;
 const int N_COL = 12;
@@ -317,7 +317,6 @@ void initializePositions() {
 
 }
 // &lt;---- END SYSTEM 3 ----&gt;
-*/
 
 // ---- MOVEMENT ----
 // Directions
@@ -511,14 +510,14 @@ bool isRescueOver() {
 // ---- COMMUNICATION ----
 // Channel declaration
 broadcast chan initialization_completed;
-broadcast chan drone_msg_start[N_CIVILIAN];
-broadcast chan civilian_noncompliance_msg[N_DRONE];
-broadcast chan drone_msg_zero_responder[N_CIVILIAN];
-broadcast chan drone_msg_contact_first_responder[N_CIVILIAN];
-broadcast chan rescue_msg[N_CIVILIAN];
-broadcast chan rescue_completed_msg[N_CIVILIAN];
-broadcast chan casualty_msg[N_CIVILIAN];
-broadcast chan civilian_contact_msg[N_FIRST_RESPONDER];
+chan drone_msg_start[N_CIVILIAN];
+chan civilian_noncompliance_msg[N_DRONE];
+chan drone_msg_zero_responder[N_CIVILIAN];
+chan drone_msg_contact_first_responder[N_CIVILIAN];
+chan rescue_msg[N_CIVILIAN];
+chan rescue_completed_msg[N_CIVILIAN];
+chan casualty_msg[N_CIVILIAN];
+urgent chan civilian_contact_msg[N_FIRST_RESPONDER];
 
 // Single message communication drone -&gt; civilian zero-responder
 // Single message communication drone -&gt; civilian
@@ -621,8 +620,6 @@ void initializeGlobalCommunication()  {
 // ---- FOR QUERIES ----
 clock global_time;
 
-int exponentialRate = 2;
-
 // Property 1 and 2
 int n_safe; // Number of safe civilians
 int n_casualty; // Number of casualties
@@ -675,7 +672,6 @@ bool areDifferent(){
 		</location>
 		<location id="id1" x="-272" y="-68">
 			<name x="-282" y="-102">Initialized</name>
-			<label kind="exponentialrate" x="-280" y="-51">exponentialRate</label>
 		</location>
 		<init ref="id0"/>
 		<transition id="id2">
@@ -778,7 +774,6 @@ void prepareNewContact() {
 		</location>
 		<location id="id4" x="-1895" y="-1521">
 			<name x="-1878" y="-1547">Idle</name>
-			<label kind="exponentialrate" x="-1887" y="-1513">exponentialRate</label>
 		</location>
 		<location id="id5" x="-977" y="-1521">
 			<committed/>
@@ -796,7 +791,6 @@ void prepareNewContact() {
 		</location>
 		<location id="id9" x="-2167" y="-1360">
 			<name x="-2218" y="-1394">EnergyDrained</name>
-			<label kind="exponentialrate" x="-2218" y="-1343">exponentialRate</label>
 		</location>
 		<branchpoint id="id10" x="-977" y="-1598"/>
 		<init ref="id3"/>
@@ -949,7 +943,6 @@ void readMessageFromContactingCivilian() {
 		</location>
 		<location id="id25" x="-1300" y="-1606">
 			<name x="-1351" y="-1598">Idle</name>
-			<label kind="exponentialrate" x="-1292" y="-1589">exponentialRate</label>
 		</location>
 		<location id="id26" x="-153" y="-1606">
 			<name x="-136" y="-1631">Assisting</name>
@@ -972,14 +965,12 @@ void readMessageFromContactingCivilian() {
 		</location>
 		<location id="id31" x="-952" y="-1462">
 			<name x="-935" y="-1487">Wandering</name>
-			<label kind="exponentialrate" x="-1096" y="-1496">exponentialRate</label>
 		</location>
 		<location id="id32" x="-1300" y="-1249">
 			<committed/>
 		</location>
 		<location id="id33" x="-1368" y="-1870">
 			<name x="-1402" y="-1904">Fatigued</name>
-			<label kind="exponentialrate" x="-1360" y="-1853">exponentialRate</label>
 		</location>
 		<location id="id34" x="-926" y="-1768">
 			<committed/>
@@ -1173,7 +1164,6 @@ void prepareNewCommunication() {
 		</location>
 		<location id="id53" x="-2694" y="-2150">
 			<name x="-2745" y="-2176">Safe</name>
-			<label kind="exponentialrate" x="-2830" y="-2142">exponentialRate</label>
 		</location>
 		<location id="id54" x="-1979" y="-1989">
 			<committed/>
@@ -1187,7 +1177,6 @@ void prepareNewCommunication() {
 		</location>
 		<location id="id57" x="-1980" y="-2303">
 			<name x="-2014" y="-2337">Casualty</name>
-			<label kind="exponentialrate" x="-1963" y="-2295">exponentialRate</label>
 		</location>
 		<location id="id58" x="-2337" y="-2150">
 			<name x="-2388" y="-2133">InAssistance</name>
@@ -1205,7 +1194,6 @@ void prepareNewCommunication() {
 		</location>
 		<location id="id62" x="-331" y="-2677">
 			<name x="-314" y="-2703">Contacting</name>
-			<label kind="exponentialrate" x="-306" y="-2669">exponentialRate</label>
 		</location>
 		<location id="id63" x="-332" y="-2201">
 			<name x="-433" y="-2227">GoingToFr</name>
@@ -1213,26 +1201,21 @@ void prepareNewCommunication() {
 		</location>
 		<location id="id64" x="-1436" y="-1989">
 			<name x="-1453" y="-2023">Idle</name>
-			<label kind="exponentialrate" x="-1572" y="-1980">exponentialRate</label>
 		</location>
 		<location id="id65" x="-332" y="-2363">
 			<name x="-450" y="-2397">WaitingForFr</name>
-			<label kind="exponentialrate" x="-476" y="-2354">exponentialRate</label>
 		</location>
 		<location id="id66" x="-1343" y="-2150">
 			<name x="-1326" y="-2176">Exhausted</name>
-			<label kind="exponentialrate" x="-1496" y="-2142">exponentialRate</label>
 		</location>
 		<location id="id67" x="-1343" y="-2295">
 			<name x="-1368" y="-2329">Missing</name>
-			<label kind="exponentialrate" x="-1334" y="-2286">exponentialRate</label>
 		</location>
 		<location id="id68" x="-50" y="-1853">
 			<committed/>
 		</location>
 		<location id="id69" x="-1657" y="-2295">
 			<name x="-1640" y="-2329">InAssistanceEx</name>
-			<label kind="exponentialrate" x="-1649" y="-2278">exponentialRate</label>
 		</location>
 		<location id="id70" x="-1640" y="-1989">
 			<committed/>
@@ -1240,46 +1223,38 @@ void prepareNewCommunication() {
 		<location id="id71" x="-884" y="-1921">
 			<committed/>
 		</location>
-		<location id="id72" x="-935" y="-1989">
-			<committed/>
-		</location>
-		<branchpoint id="id73" x="-884" y="-1989"/>
+		<branchpoint id="id72" x="-884" y="-1989"/>
 		<init ref="id51"/>
-		<transition id="id74" controllable="false">
-			<source ref="id72"/>
-			<target ref="id73"/>
-		</transition>
-		<transition id="id75">
+		<transition id="id73">
 			<source ref="id71"/>
 			<target ref="id64"/>
 			<label kind="synchronisation" x="-1283" y="-1963">civilian_noncompliance_msg[comm_drone_id]!</label>
 			<label kind="assignment" x="-1181" y="-1946">comm_drone_id = -1</label>
 			<nail x="-1283" y="-1921"/>
 		</transition>
-		<transition id="id76">
-			<source ref="id73"/>
+		<transition id="id74">
+			<source ref="id72"/>
 			<target ref="id71"/>
 			<label kind="probability" x="-875" y="-1963">100 - plisten</label>
-			<nail x="-884" y="-1963"/>
 		</transition>
-		<transition id="id77">
-			<source ref="id73"/>
+		<transition id="id75">
+			<source ref="id72"/>
 			<target ref="id56"/>
 			<label kind="probability" x="-841" y="-2014">plisten</label>
 		</transition>
-		<transition id="id78">
+		<transition id="id76">
 			<source ref="id70"/>
 			<target ref="id64"/>
 			<label kind="guard" x="-1623" y="-2014">!amExhausted()</label>
 		</transition>
-		<transition id="id79">
+		<transition id="id77">
 			<source ref="id66"/>
 			<target ref="id69"/>
 			<label kind="synchronisation" x="-1649" y="-2193">rescue_msg[civilian_id]?</label>
 			<label kind="assignment" x="-1649" y="-2176">changeStateCivilian(IN_ASSISTANCE)</label>
 			<nail x="-1657" y="-2150"/>
 		</transition>
-		<transition id="id80">
+		<transition id="id78">
 			<source ref="id69"/>
 			<target ref="id53"/>
 			<label kind="synchronisation" x="-2176" y="-2405">rescue_completed_msg[civilian_id]?</label>
@@ -1287,7 +1262,7 @@ void prepareNewCommunication() {
 			<nail x="-1657" y="-2380"/>
 			<nail x="-2694" y="-2380"/>
 		</transition>
-		<transition id="id81">
+		<transition id="id79">
 			<source ref="id68"/>
 			<target ref="id70"/>
 			<label kind="assignment" x="-526" y="-1879">prepareNewCommunication(),cEnergyUsed(civilian_id)</label>
@@ -1295,46 +1270,46 @@ void prepareNewCommunication() {
 			<nail x="-1394" y="-1938"/>
 			<nail x="-1640" y="-1938"/>
 		</transition>
-		<transition id="id82">
+		<transition id="id80">
 			<source ref="id66"/>
 			<target ref="id67"/>
 			<label kind="guard" x="-1334" y="-2252">isRescueOver()</label>
 			<label kind="assignment" x="-1334" y="-2235">n_missing++</label>
 		</transition>
-		<transition id="id83">
+		<transition id="id81">
 			<source ref="id70"/>
 			<target ref="id66"/>
 			<label kind="guard" x="-1632" y="-2091">amExhausted()</label>
 			<nail x="-1640" y="-2065"/>
 			<nail x="-1343" y="-2065"/>
 		</transition>
-		<transition id="id84">
+		<transition id="id82">
 			<source ref="id65"/>
 			<target ref="id68"/>
 			<label kind="guard" x="-306" y="-2388">!isCommVictimStillVictim()</label>
 			<nail x="187" y="-2363"/>
 			<nail x="188" y="-1853"/>
 		</transition>
-		<transition id="id85">
+		<transition id="id83">
 			<source ref="id63"/>
 			<target ref="id65"/>
 			<label kind="guard" x="-306" y="-2303">isCommVictimStillVictim() &amp;&amp;
 x &gt;= getDistanceCF(civilian_id,comm_first_responder_id)</label>
 		</transition>
-		<transition id="id86">
+		<transition id="id84">
 			<source ref="id64"/>
 			<target ref="id72"/>
 			<label kind="synchronisation" x="-1385" y="-2031">drone_msg_start[civilian_id]?</label>
 			<label kind="assignment" x="-1385" y="-2014">comm_drone_id = readMessageSingle(civilian_id,false)</label>
 		</transition>
-		<transition id="id87">
+		<transition id="id85">
 			<source ref="id63"/>
 			<target ref="id68"/>
 			<label kind="guard" x="-306" y="-2193">!isCommVictimStillVictim()</label>
 			<nail x="-51" y="-2201"/>
 			<nail x="-50" y="-1870"/>
 		</transition>
-		<transition id="id88">
+		<transition id="id86">
 			<source ref="id64"/>
 			<target ref="id52"/>
 			<label kind="select" x="-1632" y="-1921">direction : int[0,3]</label>
@@ -1343,14 +1318,14 @@ x &gt;= getDistanceCF(civilian_id,comm_first_responder_id)</label>
 			<nail x="-1436" y="-1853"/>
 			<nail x="-2694" y="-1853"/>
 		</transition>
-		<transition id="id89">
+		<transition id="id87">
 			<source ref="id62"/>
 			<target ref="id53"/>
 			<label kind="synchronisation" x="-900" y="-2703">rescue_completed_msg[civilian_id]?</label>
 			<label kind="assignment" x="-594" y="-2703">changeStateCivilian(SAFE)</label>
 			<nail x="-2694" y="-2677"/>
 		</transition>
-		<transition id="id90">
+		<transition id="id88">
 			<source ref="id65"/>
 			<target ref="id62"/>
 			<label kind="guard" x="-306" y="-2558">isCommVictimStillVictim()</label>
@@ -1358,13 +1333,13 @@ x &gt;= getDistanceCF(civilian_id,comm_first_responder_id)</label>
 			<label kind="assignment" x="-306" y="-2524">sendMessageDouble(comm_victim_id,civilian_id,
 comm_first_responder_id,FIRST_RESPONDER)</label>
 		</transition>
-		<transition id="id91">
+		<transition id="id89">
 			<source ref="id59"/>
 			<target ref="id60"/>
 			<label kind="synchronisation" x="-1105" y="-2303">rescue_msg[comm_victim_id]!</label>
 			<label kind="assignment" x="-1105" y="-2286">x = 0</label>
 		</transition>
-		<transition id="id92">
+		<transition id="id90">
 			<source ref="id56"/>
 			<target ref="id63"/>
 			<label kind="synchronisation" x="-688" y="-2116">drone_msg_contact_first_responder[civilian_id]?</label>
@@ -1374,20 +1349,20 @@ x = 0</label>
 			<nail x="-705" y="-2125"/>
 			<nail x="-331" y="-2125"/>
 		</transition>
-		<transition id="id93">
+		<transition id="id91">
 			<source ref="id61"/>
 			<target ref="id53"/>
 			<label kind="guard" x="-1589" y="-2609">x &gt;= tzr + getDistanceCC(civilian_id,comm_victim_id)</label>
 			<label kind="assignment" x="-1351" y="-2592">changeStateCivilian(SAFE)</label>
 			<nail x="-2694" y="-2618"/>
 		</transition>
-		<transition id="id94">
+		<transition id="id92">
 			<source ref="id60"/>
 			<target ref="id61"/>
 			<label kind="guard" x="-1105" y="-2558">x &lt; tzr + getDistanceCC(civilian_id,comm_victim_id)</label>
 			<label kind="synchronisation" x="-1105" y="-2541">casualty_msg[comm_victim_id]?</label>
 		</transition>
-		<transition id="id95">
+		<transition id="id93">
 			<source ref="id60"/>
 			<target ref="id53"/>
 			<label kind="guard" x="-1589" y="-2473">x &gt;= tzr + getDistanceCC(civilian_id,comm_victim_id)</label>
@@ -1396,7 +1371,7 @@ x = 0</label>
 			<nail x="-1121" y="-2482"/>
 			<nail x="-2693" y="-2482"/>
 		</transition>
-		<transition id="id96">
+		<transition id="id94">
 			<source ref="id56"/>
 			<target ref="id59"/>
 			<label kind="synchronisation" x="-1198" y="-2116">drone_msg_zero_responder[civilian_id]?</label>
@@ -1405,13 +1380,13 @@ comm_victim_id = readMessageSingle(civilian_id,true)</label>
 			<nail x="-739" y="-2125"/>
 			<nail x="-1122" y="-2125"/>
 		</transition>
-		<transition id="id97">
+		<transition id="id95">
 			<source ref="id58"/>
 			<target ref="id53"/>
 			<label kind="synchronisation" x="-2660" y="-2193">rescue_completed_msg[civilian_id]?</label>
 			<label kind="assignment" x="-2660" y="-2176">changeStateCivilian(SAFE)</label>
 		</transition>
-		<transition id="id98">
+		<transition id="id96">
 			<source ref="id58"/>
 			<target ref="id57"/>
 			<label kind="guard" x="-2328" y="-2295">x &gt;= tv</label>
@@ -1419,41 +1394,41 @@ comm_victim_id = readMessageSingle(civilian_id,true)</label>
 			<label kind="assignment" x="-2328" y="-2261">changeStateCivilian(CASUALTY)</label>
 			<nail x="-2337" y="-2303"/>
 		</transition>
-		<transition id="id99">
+		<transition id="id97">
 			<source ref="id55"/>
 			<target ref="id58"/>
 			<label kind="synchronisation" x="-2311" y="-2193">rescue_msg[civilian_id]?</label>
 			<label kind="assignment" x="-2311" y="-2176">changeStateCivilian(IN_ASSISTANCE)</label>
 		</transition>
-		<transition id="id100">
+		<transition id="id98">
 			<source ref="id55"/>
 			<target ref="id57"/>
 			<label kind="guard" x="-1963" y="-2252">x &gt;= tv</label>
 			<label kind="assignment" x="-1963" y="-2235">changeStateCivilian(CASUALTY)</label>
 		</transition>
-		<transition id="id101">
+		<transition id="id99">
 			<source ref="id54"/>
 			<target ref="id70"/>
 			<label kind="guard" x="-1963" y="-2014">!amVictim()</label>
 		</transition>
-		<transition id="id102">
+		<transition id="id100">
 			<source ref="id54"/>
 			<target ref="id55"/>
 			<label kind="guard" x="-1971" y="-2091">amVictim()</label>
 			<label kind="assignment" x="-1971" y="-2074">changeStateCivilian(VICTIM), x = 0</label>
 		</transition>
-		<transition id="id103">
+		<transition id="id101">
 			<source ref="id52"/>
 			<target ref="id54"/>
 			<label kind="guard" x="-2677" y="-2014">!amSafe()</label>
 		</transition>
-		<transition id="id104">
+		<transition id="id102">
 			<source ref="id52"/>
 			<target ref="id53"/>
 			<label kind="guard" x="-2685" y="-2091">amSafe()</label>
 			<label kind="assignment" x="-2685" y="-2074">changeStateCivilian(SAFE)</label>
 		</transition>
-		<transition id="id105">
+		<transition id="id103">
 			<source ref="id51"/>
 			<target ref="id52"/>
 			<label kind="synchronisation" x="-3085" y="-2040">initialization_completed?</label>
@@ -1477,7 +1452,7 @@ civ2 = Civilian(civilian_ids[2], civilian_tvs[2], civilian_tzrs[2], civilian_pli
 
 system initializer, drone0, drone1, fr0, fr1, civ0, civ1, civ2;
 // &lt;---- END SYSTEM 1 ----&gt;
-*/
+
 
 
 // &lt;---- SYSTEM 2 ----&gt;
@@ -1505,8 +1480,8 @@ civ10 = Civilian(civilian_ids[10], civilian_tvs[10], civilian_tzrs[10], civilian
 system initializer, drone0, drone1, fr0, fr1, fr2, fr3, fr4, civ0, civ1, civ2, civ3, civ4, civ5, civ6, civ7, civ8, civ9, civ10;
 // &lt;---- END SYSTEM 2 ----&gt;
 
+*/
 
-/*
 // &lt;---- SYSTEM 3 ----&gt;
 drone0 = Drone(drone_ids[0], drone_nvs[0], drone_pfails[0]);
 drone1 = Drone(drone_ids[1], drone_nvs[1], drone_pfails[1]);
@@ -1532,7 +1507,7 @@ civ9 = Civilian(civilian_ids[9], civilian_tvs[9], civilian_tzrs[9], civilian_pli
 
 system initializer, drone0, drone1, drone2, drone3, fr0, fr1, fr2, fr3, fr4, civ0, civ1, civ2, civ3, civ4, civ5, civ6, civ7, civ8, civ9;
 // &lt;---- END SYSTEM 3 ----&gt;
-*/</system>
+</system>
 	<queries>
 		<option key="--diagnostic" value="1"/>
 		<query>
@@ -1542,189 +1517,8 @@ system initializer, drone0, drone1, drone2, drone3, fr0, fr1, fr2, fr3, fr4, civ
 		<query>
 			<formula>A&lt;&gt; n_safe &gt;= n_percentage &amp;&amp; global_time &lt; t_scs &amp;&amp; initializer.Initialized</formula>
 			<comment/>
-			<result outcome="failure" type="quality" timestamp="2024-07-22 19:14:31 +0200">
+			<result outcome="failure" type="quality" timestamp="2024-07-22 00:04:55 +0200">
 				<option key="--diagnostic" value="1"/>
-			</result>
-		</query>
-		<query>
-			<formula>Pr[&lt;=5](&lt;&gt; n_safe&gt;= n_percentage &amp;&amp; initializer.Initialized)</formula>
-			<comment/>
-			<result outcome="success" type="quantity" value="0.232337 ± 0.0473567 (95% CI)" timestamp="2024-07-22 20:37:09 +0200">
-				<option key="--diagnostic" value="1"/>
-				<details>0.232337 ± 0.0473567 (95% CI)</details>
-				<plot title="Probability Density Distribution" xaxis="run duration in time" yaxis="probability density">
-					<series title="density" type="b(0.474573)" color="0x0000ff" encoding="csv">0.22017145331760857,0.05235175130401979
-0.6947443162695062,0.10470350260803958
-1.1693171792214039,0.12433540934704701
-1.6438900421733011,0.09161556478203464
-2.118462905125199,0.039263813478014845
-2.5930357680770966,0.03271984456501237
-3.067608631028994,0.03271984456501237
-3.5421814939808915,0.0
-4.01675435693279,0.006543968913002474
-					</series>
-					<series title="average" type="pl" color="0x00dd00" encoding="csv">1.6348667735335773,0.0
-1.6348667735335773,0.124335409347047
-					</series>
-					<comment>Parameters: α=0.05, ε=0.05, bucket width=0.47457, bucket count=9
-Runs: 322 in total, 74 (22.981%) displayed, 248 (77.019%) remaining
-Span of displayed sample: [0.2202, 4.491]
-Mean estimate of displayed sample: 1.635 ± 0.1985 (95% CI)</comment>
-				</plot>
-				<plot title="Probability Density Confidence Intervals" xaxis="run duration in time" yaxis="probability density">
-					<series title="upper limit" type="b(0.474573)" color="0xa0a0ff" encoding="csv">0.22017145331760857,0.04836525363861948
-0.6947443162695062,0.07943992893320055
-1.1693171792214039,0.09061411591685453
-1.6438900421733011,0.0718737817129359
-2.118462905125199,0.040114150426804586
-2.5930357680770966,0.03586311030585438
-3.067608631028994,0.03586311030585438
-3.5421814939808915,0.011390775591104609
-4.01675435693279,0.017180906037793056
-					</series>
-					<series title="lower limit" type="b(0.474573)" color="0x0000ff" encoding="csv">0.22017145331760857,0.010785856374684386
-0.6947443162695062,0.028665056444889862
-1.1693171792214039,0.03589579781299009
-1.6438900421733011,0.023970702660532413
-2.118462905125199,0.006868123125316285
-2.5930357680770966,0.005060609671329656
-3.067608631028994,0.005060609671329656
-3.5421814939808915,0.0
-4.01675435693279,7.86236418699168E-5
-					</series>
-					<series title="average" type="pl" color="0x00dd00" encoding="csv">1.6348667735335773,0.0
-1.6348667735335773,0.19093825835978978
-					</series>
-					<comment>Parameters: α=0.05, ε=0.05, bucket width=0.47457, bucket count=9
-Runs: 322 in total, 74 (22.981%) displayed, 248 (77.019%) remaining
-Span of displayed sample: [0.2202, 4.491]
-Mean estimate of displayed sample: 1.635 ± 0.1985 (95% CI)</comment>
-				</plot>
-				<plot title="Probability Distribution" xaxis="run duration in time" yaxis="probability">
-					<series title="probability" type="b(0.474573)" color="0x0000ff" encoding="csv">0.22017145331760857,0.024844720496894408
-0.6947443162695062,0.049689440993788817
-1.1693171792214039,0.059006211180124224
-1.6438900421733011,0.043478260869565216
-2.118462905125199,0.018633540372670808
-2.5930357680770966,0.015527950310559006
-3.067608631028994,0.015527950310559006
-3.5421814939808915,0.0
-4.01675435693279,0.003105590062111801
-					</series>
-					<series title="average" type="pl" color="0x00dd00" encoding="csv">1.6348667735335773,0.0
-1.6348667735335773,0.059006211180124224
-					</series>
-					<comment>Parameters: α=0.05, ε=0.05, bucket width=0.47457, bucket count=9
-Runs: 322 in total, 74 (22.981%) displayed, 248 (77.019%) remaining
-Span of displayed sample: [0.2202, 4.491]
-Mean estimate of displayed sample: 1.635 ± 0.1985 (95% CI)</comment>
-				</plot>
-				<plot title="Probability Confidence Intervals" xaxis="run duration in time" yaxis="probability">
-					<series title="upper limit" type="b(0.474573)" color="0xa0a0ff" encoding="csv">0.22017145331760857,0.04836525363861948
-0.6947443162695062,0.07943992893320055
-1.1693171792214039,0.09061411591685453
-1.6438900421733011,0.0718737817129359
-2.118462905125199,0.040114150426804586
-2.5930357680770966,0.03586311030585438
-3.067608631028994,0.03586311030585438
-3.5421814939808915,0.011390775591104609
-4.01675435693279,0.017180906037793056
-					</series>
-					<series title="lower limit" type="b(0.474573)" color="0x0000ff" encoding="csv">0.22017145331760857,0.010785856374684386
-0.6947443162695062,0.028665056444889862
-1.1693171792214039,0.03589579781299009
-1.6438900421733011,0.023970702660532413
-2.118462905125199,0.006868123125316285
-2.5930357680770966,0.005060609671329656
-3.067608631028994,0.005060609671329656
-3.5421814939808915,0.0
-4.01675435693279,7.86236418699168E-5
-					</series>
-					<series title="average" type="pl" color="0x00dd00" encoding="csv">1.6348667735335773,0.0
-1.6348667735335773,0.09061411591685453
-					</series>
-					<comment>Parameters: α=0.05, ε=0.05, bucket width=0.47457, bucket count=9
-Runs: 322 in total, 74 (22.981%) displayed, 248 (77.019%) remaining
-Span of displayed sample: [0.2202, 4.491]
-Mean estimate of displayed sample: 1.635 ± 0.1985 (95% CI)</comment>
-				</plot>
-				<plot title="Cumulative Probability Distribution" xaxis="run duration in time" yaxis="probability">
-					<series title="cumulative" type="l" color="0x000000" encoding="csv">0.22017145331760857,0.0
-0.6947443162695062,0.024844720496894408
-1.1693171792214039,0.07453416149068323
-1.6438900421733011,0.13354037267080746
-2.118462905125199,0.17701863354037267
-2.5930357680770966,0.1956521739130435
-3.067608631028994,0.2111801242236025
-3.5421814939808915,0.2267080745341615
-4.01675435693279,0.2267080745341615
-					</series>
-					<series title="average" type="pl" color="0x00dd00" encoding="csv">1.6348667735335773,0.0
-1.6348667735335773,0.22981366459627328
-					</series>
-					<comment>Parameters: α=0.05, ε=0.05, bucket width=0.47457, bucket count=9
-Runs: 322 in total, 74 (22.981%) displayed, 248 (77.019%) remaining
-Span of displayed sample: [0.2202, 4.491]
-Mean estimate of displayed sample: 1.635 ± 0.1985 (95% CI)</comment>
-				</plot>
-				<plot title="Cumulative Probability Confidence Intervals" xaxis="run duration in time" yaxis="probability">
-					<series title="upper limit" type="k" color="0x0000dd" encoding="csv">0.22017145331760857,0.011390775591104609
-0.6947443162695062,0.04836525363861948
-1.1693171792214039,0.10887263475881362
-1.6438900421733011,0.17563576520936539
-2.118462905125199,0.22317976757717875
-2.5930357680770966,0.24325912692529367
-3.067608631028994,0.25987732053584633
-3.5421814939808915,0.27640033440866024
-4.01675435693279,0.27640033440866024
-					</series>
-					<series title="lower limit" type="k" color="0xdd0000" encoding="csv">0.22017145331760857,0.0
-0.6947443162695062,0.010785856374684386
-1.1693171792214039,0.04833676901935645
-1.6438900421733011,0.09835719513914762
-2.118462905125199,0.13691668577355898
-2.5930357680770966,0.15374516511901995
-3.067608631028994,0.16788550313249487
-3.5421814939808915,0.18212249903095676
-4.01675435693279,0.18212249903095676
-					</series>
-					<series title="cumulative" type="l" color="0x000000" encoding="csv">0.22017145331760857,0.0
-0.6947443162695062,0.024844720496894408
-1.1693171792214039,0.07453416149068323
-1.6438900421733011,0.13354037267080746
-2.118462905125199,0.17701863354037267
-2.5930357680770966,0.1956521739130435
-3.067608631028994,0.2111801242236025
-3.5421814939808915,0.2267080745341615
-4.01675435693279,0.2267080745341615
-					</series>
-					<series title="average" type="pl" color="0x00dd00" encoding="csv">1.6348667735335773,0.0
-1.6348667735335773,0.22981366459627328
-					</series>
-					<comment>Parameters: α=0.05, ε=0.05, bucket width=0.47457, bucket count=9
-Runs: 322 in total, 74 (22.981%) displayed, 248 (77.019%) remaining
-Span of displayed sample: [0.2202, 4.491]
-Mean estimate of displayed sample: 1.635 ± 0.1985 (95% CI)</comment>
-				</plot>
-				<plot title="Frequency Histogram" xaxis="run duration in time" yaxis="count">
-					<series title="count" type="b(0.474573)" color="0x0000ff" encoding="csv">0.22017145331760857,8.0
-0.6947443162695062,16.0
-1.1693171792214039,19.0
-1.6438900421733011,14.0
-2.118462905125199,6.0
-2.5930357680770966,5.0
-3.067608631028994,5.0
-3.5421814939808915,0.0
-4.01675435693279,1.0
-					</series>
-					<series title="average" type="pl" color="0x00dd00" encoding="csv">1.6348667735335773,0.0
-1.6348667735335773,19.0
-					</series>
-					<comment>Parameters: α=0.05, ε=0.05, bucket width=0.47457, bucket count=9
-Runs: 322 in total, 74 (22.981%) displayed, 248 (77.019%) remaining
-Span of displayed sample: [0.2202, 4.491]
-Mean estimate of displayed sample: 1.635 ± 0.1985 (95% CI)</comment>
-				</plot>
 			</result>
 		</query>
 		<query>
