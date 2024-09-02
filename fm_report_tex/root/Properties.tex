@@ -1,0 +1,202 @@
+
+\section{Properties}
+
+\subsection{Scenarios}
+
+The followings are the three designed scenarios to evaluate the above described model: Urban High-Rise Fire, Large-Scale Natural Disaster, and Industrial Complex Emergency. The following table summarizes their key parameters:
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|l|c|c|c|}
+		\hline
+		\textbf{Parameter} & \textbf{Scenario 1} & \textbf{Scenario 2} & \textbf{Scenario 3} \\
+		\hline
+		Environment & Urban High-Rise & Natural Disaster & Industrial Complex \\
+		Map Size & 8x10 & 20x14 & 18x12 \\
+		N.Drones (visibility) & 2 ($n_v = 2$) & 2 ($n_v = 3$) & 4 ($n_v = 1$) \\
+		N.First-Responders (rescue time) & 2 ($t_{fr} = 2-3$) & 5 ($t_{fr} = 8$) & 5 ($t_{fr} = 4$) \\
+		N.Civilians (time to live, & 3 ($t_v = 2-11$, & 11 ($t_v = 15-25$, & 10 ($t_v = 15-25$, \\
+		zero-responder rescue time) & $t_{zr} = 1-2$) & $t_{zr} = 6$) & $t_{zr} = 5$) \\
+		\hline
+	\end{tabular}
+	\caption{Summary of Emergency Response Scenarios}
+	\label{tab:scenarios}
+\end{table}
+
+There are a finite number of possible states combinations, due to the terminating conditions discussed in section~\ref{sec:term} and this number depends on the ”max tiredness threshold”s selected. For all the scenarios these thresholds were set to 5, to have a good number of states, but not too many. And already with such small numbers the total number of possibilities was very high, highlighting the rapid growth of complexity.\newline
+
+These scenarios assess system performance in different conditions, such as dense urban vs. widespread disaster areas, limited vs. advanced drone capabilities, and varying civilian vulnerability.
+\subsubsection{Scenario 1: Urban High-Rise Fire}
+This scenario tests efficiency in a compact, high-stakes environment. The compact map simulates a dense urban environment with advanced drones, with for example thermal imaging capabilities. Limited responders reflect initial teams, while varied civilians’ time to live test prioritization in time sensitive situations.
+\subsubsection{Scenario 2: Large-Scale Natural Disaster}
+This scenario tests handling of complex, large-scale situations with limited but advanced rescue entities. The large map represents a widespread disaster area. High drones’ visibility tests advanced drones allocation over a vast area. Similar high rescue times reflect environmental challenges, while high civilians’ time to live simulates a well prepared population.
+\subsubsection{Scenario 3: Industrial Complex Emergency}
+This scenario tests operations in a hazardous environment with low-visibility drones. The medium-sized map simulates varied industrial terrain. Low-visibility drones reflect operational challenges in potentially hazardous conditions. High rescue times account for the complex environment, while varied civilians’ time to live represent different risk levels across the industrial complex.
+
+\subsection{Stochastic Scenario Versions}
+The stochastic scenarios are equal to the non-stochastic ones above described. The only additions are the new required parameters for the drone and the civilian templates. To simulate a wide range of realistic possibilities the values of \textit{pfails} and \textit{plistens} across the three different scenarios are well balanced. A rescue level drone should not fail more than 10\% of the times, while it was made the optimistic assumption that a civilian, even under stress, would listen with probability not below 75\%.\newline
+To enable the probabilistic model checking, it was necessary to convert all channels into broadcast ones.
+
+\subsection{Verification Results (Non-Stochastic)}
+
+This section discusses the results of two queries on three systems to assess the efficiency and reliability of civilian rescue operations under various constraints. The key variables were $N\%$ (percentage of civilians to be rescued) and $T_{scs}$ (time constraint for rescue).
+
+The queries in question are:
+
+
+\begin{quote}
+	\raggedright
+	\begin{itemize}
+		\item \texttt{E<> n\_safe >= n\_percentage \&\& global\_time < t\_scs \&\& initializer.Initialized}\newline
+                Check if at least one path allows rescuing \textit{N\%} of civilians within $T_{scs}$.
+		\item \texttt{A<> n\_safe >= n\_percentage \&\& global\_time < t\_scs \&\& initializer.Initialized}\newline
+                Check if all paths lead to rescuing at least \textit{N\%} of civilians within $T_{scs}$.
+	\end{itemize}
+\end{quote}
+
+These queries evaluate the possibility (\texttt{E<>}) and inevitability (\texttt{A<>}) of rescuing a certain percentage of civilians within a time frame.
+
+For the tables 'V' indicates a successful query, while '$\infty$' means that the query was running for a long time, meaning the result could be successful or not (but is very likely it will eventually turn not successful). 
+
+\subsubsection{Scenario 1 Results}
+
+The second query always returned false, indicating no guaranteed rescue within the time constraints.\newline
+The first query gave more varied results, summarized below:
+
+\begin{table}[H]
+	\centering
+	\small
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		$T_{scs}\backslash N\%$ & 25\% & 50\% & 75\% & 100\% \\ \hline
+		8                       & F    & F    & F    & F     \\ \hline
+		9                       & V    & F    & F    & F     \\ \hline
+		10                      & V    & F    & F    & F     \\ \hline
+		11                      & V    & F    & F    & F     \\ \hline
+		12                      & V    & V    & V    & F     \\ \hline
+		13                      & V    & V    & V    & F     \\ \hline
+		14                      & V    & V    & V    & F     \\ \hline
+		15                      & V    & V    & V    & V     \\ \hline
+	\end{tabular}
+	\caption{Scenario 1 - Query 1 Results}
+	\label{tab:system1}
+	\normalsize
+\end{table}
+
+
+These results show that significant rescues are possible given enough time, highlighting the importance of quick response and efficient entities allocation early in rescue operations.
+
+\subsubsection{Scenario 2 Results}
+For the second scenario, our analysis revealed distinct patterns in the rescue operation’s dynamics. The outcomes for the first query are summarized in the following table:
+
+\begin{table}[H]
+	\centering
+	\small
+	\begin{tabular}{|c|c|c|c|c|c|c|}
+		\hline
+		$T_{scs}\backslash N\%$ & 1 & 2 & 25\% & 50\% & 75\% & 100\% \\ \hline
+		5                      & V & V & $\infty$ & $\infty$ & $\infty$ & $\infty$ \\ \hline
+		10                     & V & V & $\infty$ & $\infty$ & $\infty$ & $\infty$ \\ \hline
+		100                    & V & V & $\infty$ & $\infty$ & $\infty$ & $\infty$ \\ \hline
+	\end{tabular}
+	\caption{Scenario 2 - Query 1 Results}
+	\label{tab:system1}
+	\normalsize
+\end{table}
+
+
+For the second query, the results show that it returns true if and only if the number of people to be saved is 1 and this happens regardless of the time constraints, due to the fact that there is a civilian near an exit.
+
+These findings suggest that scenario 2 has a more constrained rescue capability compared to scenario 1. The system provides a consistent level of performance for small-scale rescues but faces significant challenges in scaling up to larger percentages of the civilian population.
+
+
+\subsubsection{Scenario 3 Results}
+
+Scenario 3 exhibits characteristics similar to scenario 2, with the difference that query 2 returns always false, since there is no civilian near exit.
+
+Key observations for scenario 3:
+\begin{enumerate}
+	\item The scenario maintains the possibility of saving up to 2 civilians across all time frames.
+	\item As with scenario 2, increasing the time constraint does not improve rescue potential for larger groups.
+	\item The false result for query 2 suggests that even saving a single civilian is not guaranteed under all circumstances.
+	\item The scenario can never guarantee for rescuing 25\% or more of the civilians.
+\end{enumerate}
+
+Scenario 3 presents a more challenging rescue environment compared to scenario 1 and 2. While it retains the potential for medium-scale rescues, it lacks any guaranteed successful outcomes, indicating a higher level of uncertainty in rescue operations.
+
+\subsection{Verification Results (Stochastic)}
+In addition to the deterministic queries, it was decided to conduct a stochastic analysis on the three scenarios using the following query:
+
+\begin{quote}
+	\texttt{Pr[<=t\_scs](<> n\_safe >= n\_percentage \&\& initializer.Initialized)}\newline
+            Returns the probability that in less than or equal time to $T_{scs}$, the condition of safety is respected.
+\end{quote}
+
+\subsubsection{Scenario 1 Results}
+Key findings include:
+
+\begin{itemize}
+	\item Time Range: The study was conducted for time intervals ranging from 8 to 15, mirroring the non-stochastic model.
+	\item Consistent Low Probability for 25\% Rescue:
+	\begin{itemize}
+		\item When time $\ge$ 9, the probability of saving 25\% of the population remains constant at 15\%.
+	\end{itemize}
+	\item Time Threshold for Higher Rescue Percentages:
+	\begin{itemize}
+		\item Rescuing 50\% or more of the population becomes feasible when time $\ge$ 12, albeit with a very low probability.
+		\item At time $\ge$ 12, the probability of saving 50\% or more people reaches a minimum viable level of 5\%.
+	\end{itemize}
+	\item Extreme Rescue Scenarios:
+	\begin{itemize}
+		\item Even at the maximum studied time (t = 15), the probability of saving 100\% of the population remains extremely low.
+	\end{itemize}
+\end{itemize}
+
+\begin{itemize}
+	\item Observations:
+	\begin{itemize}
+		\item The study reveals a clear relationship between time and rescue probability, with longer time intervals generally allowing for higher chances of successful rescues.
+		\item However, even with increased time, the probabilities of saving larger percentages of the population remain relatively low.
+		\item There appears to be a significant threshold at t = 12, after which more ambitious rescue operations become possible, albeit still challenging.
+		\item The findings suggest that while extended time improves rescue capabilities, other factors likely play crucial roles in determining the overall success of large-scale rescue operations.
+		\item These results underscore the complexity of rescue scenarios and highlight the need for efficient strategies that can maximize the number of lives saved within given time constraints.
+	\end{itemize}
+\end{itemize}
+
+\subsubsection{Scenario 2 and 3 Results}
+For both Scenario 2 and Scenario 3, similar patterns emerged in the stochastic analysis:
+
+\begin{itemize}
+	\item Probability of rescuing 25\% of civilians:
+	\begin{itemize}
+		\item At t = 5: 5\% success rate
+		\item At t = 30: 15\% success rate
+		\item At t = 50: 20\% success rate
+	\end{itemize}
+	
+	\item Probability of rescuing 50\% of civilians:
+	\begin{itemize}
+		\item At t = 5: 0\% success rate
+		\item At t = 15: 0\% success rate
+		\item At t = 50: 0\% success rate
+	\end{itemize}
+\end{itemize}
+
+The stochastic analysis of Scenarios 2 and 3 provides valuable insights into the challenges and limitations of large-scale emergency response operations:
+
+\begin{enumerate}
+	\item Time-dependent rescue probability: As time increases, the probability of rescuing a quarter of the civilians also increases, but with diminishing returns. This suggests that while extended operation time is beneficial, other factors become limiting as time progresses.
+	
+	\item Difficulty in large-scale rescues: The consistently low (often zero) probability of rescuing 50\% or more of the civilians, even with extended time, indicates significant challenges in achieving large-scale rescues in these scenarios.
+	
+	\item Scalability issues: The stark contrast between the probabilities of rescuing 25\% versus 50\% of civilians highlights potential scalability problems in the rescue operations.
+	
+	\item Environmental complexity: The similarity in results between Scenarios 2 and 3 suggests that both the large-scale natural disaster and the industrial complex emergency present comparable levels of difficulty for rescue operations.
+	
+	\item Resource limitations: The low success rates, even with extended time, may indicate that the available resources (drones and first responders) are insufficient for the scale of these emergencies.
+	
+	\item Importance of early response: The slight increase in success probability for 25\% rescue between t=5 and t=30 emphasizes the critical nature of the initial response period.
+	
+	\item Long-term challenges: The minimal improvement in success rates beyond t=50 suggests that prolonged operations face diminishing returns, possibly due to factors like resource depletion or environmental changes.
+\end{enumerate}
+
+These results underscore the complexity of large-scale emergency responses and highlight the need for strategies that can effectively allocate limited resources, prioritize early interventions, and potentially increase the scale of response capabilities to improve outcomes in challenging scenarios.
